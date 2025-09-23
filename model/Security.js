@@ -43,7 +43,7 @@ const securityEventSchema = new mongoose.Schema(
       enum: ["low", "medium", "high", "critical"],
       default: "medium",
     },
-    
+
     // User and session information
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -62,7 +62,7 @@ const securityEventSchema = new mongoose.Schema(
       enum: ["user", "admin", "superadmin", "system"],
       required: true,
     },
-    
+
     // Request details
     ipAddress: {
       type: String,
@@ -82,7 +82,7 @@ const securityEventSchema = new mongoose.Schema(
         longitude: Number,
       },
     },
-    
+
     // Event details
     resource: {
       type: String, // What was accessed/modified
@@ -99,7 +99,7 @@ const securityEventSchema = new mongoose.Schema(
     metadata: {
       type: mongoose.Schema.Types.Mixed, // Additional event-specific data
     },
-    
+
     // Request and response data (for audit purposes)
     requestData: {
       endpoint: String,
@@ -112,7 +112,7 @@ const securityEventSchema = new mongoose.Schema(
       min: 100,
       max: 599,
     },
-    
+
     // Risk assessment
     riskScore: {
       type: Number,
@@ -120,25 +120,29 @@ const securityEventSchema = new mongoose.Schema(
       max: 100,
       default: 0,
     },
-    riskFactors: [{
-      factor: String,
-      score: Number,
-      description: String,
-    }],
-    
+    riskFactors: [
+      {
+        factor: String,
+        score: Number,
+        description: String,
+      },
+    ],
+
     // Compliance tracking
-    complianceFlags: [{
-      regulation: {
-        type: String,
-        enum: ["GDPR", "HIPAA", "CCPA", "SOX", "PCI_DSS", "ISO27001"],
+    complianceFlags: [
+      {
+        regulation: {
+          type: String,
+          enum: ["GDPR", "HIPAA", "CCPA", "SOX", "PCI_DSS", "ISO27001"],
+        },
+        requiresAttention: {
+          type: Boolean,
+          default: false,
+        },
+        reason: String,
       },
-      requiresAttention: {
-        type: Boolean,
-        default: false,
-      },
-      reason: String,
-    }],
-    
+    ],
+
     // Investigation and resolution
     investigated: {
       type: Boolean,
@@ -155,7 +159,7 @@ const securityEventSchema = new mongoose.Schema(
       default: false,
     },
     resolution: String,
-    
+
     // Timestamps
     timestamp: {
       type: Date,
@@ -182,84 +186,97 @@ const dataPrivacyConsentSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    
+
     // Consent tracking
-    consents: [{
-      type: {
-        type: String,
-        enum: [
-          "data_processing",
-          "marketing_communications",
-          "analytics_tracking",
-          "third_party_sharing",
-          "cookies_functional",
-          "cookies_analytics",
-          "cookies_advertising",
-          "location_tracking",
-          "biometric_data",
-          "automated_decision_making",
-        ],
-        required: true,
+    consents: [
+      {
+        type: {
+          type: String,
+          enum: [
+            "data_processing",
+            "marketing_communications",
+            "analytics_tracking",
+            "third_party_sharing",
+            "cookies_functional",
+            "cookies_analytics",
+            "cookies_advertising",
+            "location_tracking",
+            "biometric_data",
+            "automated_decision_making",
+          ],
+          required: true,
+        },
+        granted: {
+          type: Boolean,
+          required: true,
+        },
+        grantedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        revokedAt: Date,
+        ipAddress: String,
+        userAgent: String,
+        legalBasis: {
+          type: String,
+          enum: [
+            "consent",
+            "contract",
+            "legal_obligation",
+            "vital_interests",
+            "public_task",
+            "legitimate_interests",
+          ],
+          default: "consent",
+        },
+        version: {
+          type: String,
+          default: "1.0",
+        },
       },
-      granted: {
-        type: Boolean,
-        required: true,
-      },
-      grantedAt: {
-        type: Date,
-        default: Date.now,
-      },
-      revokedAt: Date,
-      ipAddress: String,
-      userAgent: String,
-      legalBasis: {
-        type: String,
-        enum: ["consent", "contract", "legal_obligation", "vital_interests", "public_task", "legitimate_interests"],
-        default: "consent",
-      },
-      version: {
-        type: String,
-        default: "1.0",
-      },
-    }],
-    
+    ],
+
     // Data subject rights
-    dataSubjectRights: [{
-      requestType: {
-        type: String,
-        enum: [
-          "access", // Right to access
-          "rectification", // Right to rectification
-          "erasure", // Right to be forgotten
-          "restrict_processing", // Right to restrict processing
-          "data_portability", // Right to data portability
-          "object_processing", // Right to object
-          "automated_decision_opt_out", // Right not to be subject to automated decision-making
+    dataSubjectRights: [
+      {
+        requestType: {
+          type: String,
+          enum: [
+            "access", // Right to access
+            "rectification", // Right to rectification
+            "erasure", // Right to be forgotten
+            "restrict_processing", // Right to restrict processing
+            "data_portability", // Right to data portability
+            "object_processing", // Right to object
+            "automated_decision_opt_out", // Right not to be subject to automated decision-making
+          ],
+          required: true,
+        },
+        requestedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        status: {
+          type: String,
+          enum: ["pending", "in_progress", "completed", "rejected"],
+          default: "pending",
+        },
+        handledBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "SuperAdmin",
+        },
+        completedAt: Date,
+        notes: String,
+        attachments: [
+          {
+            filename: String,
+            url: String,
+            encrypted: Boolean,
+          },
         ],
-        required: true,
       },
-      requestedAt: {
-        type: Date,
-        default: Date.now,
-      },
-      status: {
-        type: String,
-        enum: ["pending", "in_progress", "completed", "rejected"],
-        default: "pending",
-      },
-      handledBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SuperAdmin",
-      },
-      completedAt: Date,
-      notes: String,
-      attachments: [{
-        filename: String,
-        url: String,
-        encrypted: Boolean,
-      }],
-    }],
-    
+    ],
+
     // Data retention
     dataRetention: {
       retentionPeriod: {
@@ -276,7 +293,7 @@ const dataPrivacyConsentSchema = new mongoose.Schema(
         default: true,
       },
     },
-    
+
     // Privacy settings
     privacySettings: {
       profileVisibility: {
@@ -297,21 +314,23 @@ const dataPrivacyConsentSchema = new mongoose.Schema(
         default: false,
       },
     },
-    
+
     // Breach notifications
-    breachNotifications: [{
-      breachId: String,
-      notifiedAt: Date,
-      method: {
-        type: String,
-        enum: ["email", "in_app", "postal_mail", "phone"],
+    breachNotifications: [
+      {
+        breachId: String,
+        notifiedAt: Date,
+        method: {
+          type: String,
+          enum: ["email", "in_app", "postal_mail", "phone"],
+        },
+        acknowledged: {
+          type: Boolean,
+          default: false,
+        },
+        acknowledgedAt: Date,
       },
-      acknowledged: {
-        type: Boolean,
-        default: false,
-      },
-      acknowledgedAt: Date,
-    }],
+    ],
   },
   {
     timestamps: true,
@@ -328,11 +347,18 @@ const complianceAuditSchema = new mongoose.Schema(
       type: String,
       unique: true,
       required: true,
-      default: () => `AUDIT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      default: () =>
+        `AUDIT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     },
     auditType: {
       type: String,
-      enum: ["scheduled", "incident_response", "compliance_check", "security_review", "data_protection"],
+      enum: [
+        "scheduled",
+        "incident_response",
+        "compliance_check",
+        "security_review",
+        "data_protection",
+      ],
       required: true,
     },
     regulation: {
@@ -340,7 +366,7 @@ const complianceAuditSchema = new mongoose.Schema(
       enum: ["GDPR", "HIPAA", "CCPA", "SOX", "PCI_DSS", "ISO27001", "GENERAL"],
       required: true,
     },
-    
+
     // Audit scope and timeline
     scope: {
       type: String,
@@ -357,70 +383,81 @@ const complianceAuditSchema = new mongoose.Schema(
       enum: ["planned", "in_progress", "completed", "suspended"],
       default: "planned",
     },
-    
+
     // Audit team
-    auditTeam: [{
-      adminId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SuperAdmin",
-        required: true,
+    auditTeam: [
+      {
+        adminId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "SuperAdmin",
+          required: true,
+        },
+        role: {
+          type: String,
+          enum: [
+            "lead_auditor",
+            "auditor",
+            "technical_expert",
+            "compliance_officer",
+          ],
+          required: true,
+        },
+        assignedAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
-      role: {
-        type: String,
-        enum: ["lead_auditor", "auditor", "technical_expert", "compliance_officer"],
-        required: true,
-      },
-      assignedAt: {
-        type: Date,
-        default: Date.now,
-      },
-    }],
-    
+    ],
+
     // Audit findings
-    findings: [{
-      findingId: {
-        type: String,
-        default: () => crypto.randomUUID(),
+    findings: [
+      {
+        findingId: {
+          type: String,
+          default: () => crypto.randomUUID(),
+        },
+        category: {
+          type: String,
+          enum: ["critical", "major", "minor", "observation"],
+          required: true,
+        },
+        area: String, // Which system/process area
+        description: {
+          type: String,
+          required: true,
+          maxLength: 2000,
+        },
+        evidence: [
+          {
+            type: String,
+            url: String,
+            description: String,
+          },
+        ],
+        riskLevel: {
+          type: String,
+          enum: ["low", "medium", "high", "critical"],
+          required: true,
+        },
+        recommendation: {
+          type: String,
+          maxLength: 1000,
+        },
+        status: {
+          type: String,
+          enum: ["open", "in_progress", "resolved", "accepted_risk"],
+          default: "open",
+        },
+        assignedTo: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "SuperAdmin",
+        },
+        dueDate: Date,
+        resolvedAt: Date,
+        resolution: String,
       },
-      category: {
-        type: String,
-        enum: ["critical", "major", "minor", "observation"],
-        required: true,
-      },
-      area: String, // Which system/process area
-      description: {
-        type: String,
-        required: true,
-        maxLength: 2000,
-      },
-      evidence: [{
-        type: String,
-        url: String,
-        description: String,
-      }],
-      riskLevel: {
-        type: String,
-        enum: ["low", "medium", "high", "critical"],
-        required: true,
-      },
-      recommendation: {
-        type: String,
-        maxLength: 1000,
-      },
-      status: {
-        type: String,
-        enum: ["open", "in_progress", "resolved", "accepted_risk"],
-        default: "open",
-      },
-      assignedTo: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SuperAdmin",
-      },
-      dueDate: Date,
-      resolvedAt: Date,
-      resolution: String,
-    }],
-    
+    ],
+
     // Compliance scores
     complianceScore: {
       overall: {
@@ -428,31 +465,35 @@ const complianceAuditSchema = new mongoose.Schema(
         min: 0,
         max: 100,
       },
-      categories: [{
-        name: String,
-        score: Number,
-        maxScore: Number,
-      }],
+      categories: [
+        {
+          name: String,
+          score: Number,
+          maxScore: Number,
+        },
+      ],
     },
-    
+
     // Reports and documentation
-    reports: [{
-      reportType: {
-        type: String,
-        enum: ["preliminary", "draft", "final", "executive_summary"],
+    reports: [
+      {
+        reportType: {
+          type: String,
+          enum: ["preliminary", "draft", "final", "executive_summary"],
+        },
+        filename: String,
+        url: String,
+        generatedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        generatedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "SuperAdmin",
+        },
       },
-      filename: String,
-      url: String,
-      generatedAt: {
-        type: Date,
-        default: Date.now,
-      },
-      generatedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SuperAdmin",
-      },
-    }],
-    
+    ],
+
     // External auditor information (if applicable)
     externalAuditor: {
       company: String,
@@ -479,19 +520,37 @@ const encryptionKeySchema = new mongoose.Schema(
     },
     keyType: {
       type: String,
-      enum: ["master", "data_encryption", "token_signing", "api_key", "temporary"],
+      enum: [
+        "master",
+        "data_encryption",
+        "token_signing",
+        "api_key",
+        "temporary",
+      ],
       required: true,
     },
     algorithm: {
       type: String,
-      enum: ["AES-256-GCM", "RSA-2048", "RSA-4096", "ECDSA-P256", "HMAC-SHA256"],
+      enum: [
+        "AES-256-GCM",
+        "RSA-2048",
+        "RSA-4096",
+        "ECDSA-P256",
+        "HMAC-SHA256",
+      ],
       required: true,
     },
-    
+
     // Key lifecycle
     status: {
       type: String,
-      enum: ["active", "inactive", "compromised", "expired", "rotation_pending"],
+      enum: [
+        "active",
+        "inactive",
+        "compromised",
+        "expired",
+        "rotation_pending",
+      ],
       default: "active",
     },
     createdAt: {
@@ -502,7 +561,7 @@ const encryptionKeySchema = new mongoose.Schema(
     expiresAt: Date,
     rotationScheduled: Date,
     lastUsedAt: Date,
-    
+
     // Key metadata (actual keys stored in secure key management system)
     keyVersion: {
       type: Number,
@@ -516,31 +575,35 @@ const encryptionKeySchema = new mongoose.Schema(
       type: String, // Reference to external key management system
       required: true,
     },
-    
+
     // Access control
-    authorizedUsers: [{
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        refPath: "authorizedUsers.userType",
+    authorizedUsers: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          refPath: "authorizedUsers.userType",
+        },
+        userType: {
+          type: String,
+          enum: ["User", "SuperAdmin"],
+        },
+        permissions: [
+          {
+            type: String,
+            enum: ["read", "encrypt", "decrypt", "rotate", "revoke"],
+          },
+        ],
+        grantedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        grantedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "SuperAdmin",
+        },
       },
-      userType: {
-        type: String,
-        enum: ["User", "SuperAdmin"],
-      },
-      permissions: [{
-        type: String,
-        enum: ["read", "encrypt", "decrypt", "rotate", "revoke"],
-      }],
-      grantedAt: {
-        type: Date,
-        default: Date.now,
-      },
-      grantedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SuperAdmin",
-      },
-    }],
-    
+    ],
+
     // Usage tracking
     usageStats: {
       encryptionOperations: {
@@ -553,17 +616,19 @@ const encryptionKeySchema = new mongoose.Schema(
       },
       lastActivity: Date,
     },
-    
+
     // Rotation history
-    rotationHistory: [{
-      previousKeyId: String,
-      rotatedAt: Date,
-      rotatedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SuperAdmin",
+    rotationHistory: [
+      {
+        previousKeyId: String,
+        rotatedAt: Date,
+        rotatedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "SuperAdmin",
+        },
+        reason: String,
       },
-      reason: String,
-    }],
+    ],
   },
   {
     timestamps: true,
@@ -594,87 +659,113 @@ encryptionKeySchema.index({ expiresAt: 1 });
 encryptionKeySchema.index({ rotationScheduled: 1 });
 
 // Virtual fields
-securityEventSchema.virtual("isHighRisk").get(function() {
-  return this.severity === "high" || this.severity === "critical" || this.riskScore > 70;
+securityEventSchema.virtual("isHighRisk").get(function () {
+  return (
+    this.severity === "high" ||
+    this.severity === "critical" ||
+    this.riskScore > 70
+  );
 });
 
-securityEventSchema.virtual("requiresInvestigation").get(function() {
-  return !this.investigated && (this.isHighRisk || this.eventType.includes("breach") || this.eventType.includes("suspicious"));
+securityEventSchema.virtual("requiresInvestigation").get(function () {
+  return (
+    !this.investigated &&
+    (this.isHighRisk ||
+      this.eventType.includes("breach") ||
+      this.eventType.includes("suspicious"))
+  );
 });
 
-dataPrivacyConsentSchema.virtual("hasValidConsent").get(function() {
+dataPrivacyConsentSchema.virtual("hasValidConsent").get(function () {
   const requiredConsents = ["data_processing"];
-  return requiredConsents.every(type => 
-    this.consents.some(consent => 
-      consent.type === type && consent.granted && !consent.revokedAt
+  return requiredConsents.every((type) =>
+    this.consents.some(
+      (consent) =>
+        consent.type === type && consent.granted && !consent.revokedAt
     )
   );
 });
 
-complianceAuditSchema.virtual("openFindings").get(function() {
-  return this.findings.filter(finding => finding.status === "open").length;
+complianceAuditSchema.virtual("openFindings").get(function () {
+  return this.findings.filter((finding) => finding.status === "open").length;
 });
 
-complianceAuditSchema.virtual("criticalFindings").get(function() {
-  return this.findings.filter(finding => finding.category === "critical").length;
+complianceAuditSchema.virtual("criticalFindings").get(function () {
+  return this.findings.filter(
+    (finding) => finding.category === "critical"
+  ).length;
 });
 
 // Static methods
-securityEventSchema.statics.logEvent = async function(eventData) {
+securityEventSchema.statics.logEvent = async function (eventData) {
   try {
     // Calculate risk score based on event type and context
     let riskScore = 0;
     const riskFactors = [];
-    
+
     // Base risk scores by event type
     const riskMap = {
-      "login_failure": 10,
-      "permission_denied": 20,
-      "suspicious_activity": 60,
-      "security_breach_attempt": 90,
-      "data_deletion": 40,
-      "bulk_operation": 30,
-      "export_data": 35,
+      login_failure: 10,
+      permission_denied: 20,
+      suspicious_activity: 60,
+      security_breach_attempt: 90,
+      data_deletion: 40,
+      bulk_operation: 30,
+      export_data: 35,
     };
-    
+
     riskScore = riskMap[eventData.eventType] || 5;
-    
+
     // Adjust risk based on additional factors
     if (eventData.userType === "admin" || eventData.userType === "superadmin") {
       riskScore += 10;
-      riskFactors.push({ factor: "privileged_user", score: 10, description: "Event involves privileged user account" });
+      riskFactors.push({
+        factor: "privileged_user",
+        score: 10,
+        description: "Event involves privileged user account",
+      });
     }
-    
+
     // IP-based risk (simplified - in production, use IP reputation services)
     if (eventData.ipAddress && eventData.ipAddress.startsWith("10.")) {
       riskScore -= 5; // Internal network
     } else {
       riskScore += 5; // External network
-      riskFactors.push({ factor: "external_ip", score: 5, description: "Event from external IP address" });
+      riskFactors.push({
+        factor: "external_ip",
+        score: 5,
+        description: "Event from external IP address",
+      });
     }
-    
+
     // Time-based risk (outside business hours)
     const eventHour = new Date().getHours();
     if (eventHour < 6 || eventHour > 22) {
       riskScore += 15;
-      riskFactors.push({ factor: "off_hours", score: 15, description: "Event outside business hours" });
+      riskFactors.push({
+        factor: "off_hours",
+        score: 15,
+        description: "Event outside business hours",
+      });
     }
-    
+
     const event = new this({
       ...eventData,
       riskScore: Math.min(riskScore, 100),
       riskFactors,
       timestamp: new Date(),
     });
-    
+
     await event.save();
-    
+
     // Trigger alerts for high-risk events
     if (event.isHighRisk) {
       // In production, send alerts to security team
-      console.log(`HIGH RISK SECURITY EVENT: ${event.eventType} - Risk Score: ${event.riskScore}`);
+      console.log(
+        `HIGH RISK SECURITY EVENT: ${event.eventType} - Risk Score: ${event.riskScore}`
+      );
     }
-    
+
     return event;
   } catch (error) {
     console.error("Error logging security event:", error);
@@ -682,10 +773,12 @@ securityEventSchema.statics.logEvent = async function(eventData) {
   }
 };
 
-securityEventSchema.statics.getSecurityMetrics = async function(timeframe = 30) {
+securityEventSchema.statics.getSecurityMetrics = async function (
+  timeframe = 30
+) {
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - timeframe);
-  
+
   const metrics = await this.aggregate([
     { $match: { timestamp: { $gte: startDate } } },
     {
@@ -693,45 +786,65 @@ securityEventSchema.statics.getSecurityMetrics = async function(timeframe = 30) 
         _id: null,
         totalEvents: { $sum: 1 },
         highRiskEvents: {
-          $sum: { $cond: [{ $or: [{ $eq: ["$severity", "high"] }, { $eq: ["$severity", "critical"] }] }, 1, 0] }
+          $sum: {
+            $cond: [
+              {
+                $or: [
+                  { $eq: ["$severity", "high"] },
+                  { $eq: ["$severity", "critical"] },
+                ],
+              },
+              1,
+              0,
+            ],
+          },
         },
         loginFailures: {
-          $sum: { $cond: [{ $eq: ["$eventType", "login_failure"] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$eventType", "login_failure"] }, 1, 0] },
         },
         dataAccesses: {
-          $sum: { $cond: [{ $eq: ["$eventType", "data_access"] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$eventType", "data_access"] }, 1, 0] },
         },
         breachAttempts: {
-          $sum: { $cond: [{ $eq: ["$eventType", "security_breach_attempt"] }, 1, 0] }
+          $sum: {
+            $cond: [{ $eq: ["$eventType", "security_breach_attempt"] }, 1, 0],
+          },
         },
         avgRiskScore: { $avg: "$riskScore" },
         uninvestigatedEvents: {
-          $sum: { $cond: [{ $eq: ["$investigated", false] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$investigated", false] }, 1, 0] },
         },
-      }
-    }
+      },
+    },
   ]);
-  
-  return metrics[0] || {
-    totalEvents: 0,
-    highRiskEvents: 0,
-    loginFailures: 0,
-    dataAccesses: 0,
-    breachAttempts: 0,
-    avgRiskScore: 0,
-    uninvestigatedEvents: 0,
-  };
+
+  return (
+    metrics[0] || {
+      totalEvents: 0,
+      highRiskEvents: 0,
+      loginFailures: 0,
+      dataAccesses: 0,
+      breachAttempts: 0,
+      avgRiskScore: 0,
+      uninvestigatedEvents: 0,
+    }
+  );
 };
 
 // Instance methods
-dataPrivacyConsentSchema.methods.grantConsent = function(consentType, ipAddress, userAgent, legalBasis = "consent") {
+dataPrivacyConsentSchema.methods.grantConsent = function (
+  consentType,
+  ipAddress,
+  userAgent,
+  legalBasis = "consent"
+) {
   // Revoke existing consent of same type
-  this.consents.forEach(consent => {
+  this.consents.forEach((consent) => {
     if (consent.type === consentType && consent.granted && !consent.revokedAt) {
       consent.revokedAt = new Date();
     }
   });
-  
+
   // Add new consent
   this.consents.push({
     type: consentType,
@@ -741,12 +854,14 @@ dataPrivacyConsentSchema.methods.grantConsent = function(consentType, ipAddress,
     userAgent,
     legalBasis,
   });
-  
+
   return this.save();
 };
 
-dataPrivacyConsentSchema.methods.revokeConsent = function(consentType) {
-  const consent = this.consents.find(c => c.type === consentType && c.granted && !c.revokedAt);
+dataPrivacyConsentSchema.methods.revokeConsent = function (consentType) {
+  const consent = this.consents.find(
+    (c) => c.type === consentType && c.granted && !c.revokedAt
+  );
   if (consent) {
     consent.revokedAt = new Date();
     return this.save();
@@ -754,7 +869,7 @@ dataPrivacyConsentSchema.methods.revokeConsent = function(consentType) {
   return Promise.resolve(this);
 };
 
-complianceAuditSchema.methods.addFinding = function(findingData) {
+complianceAuditSchema.methods.addFinding = function (findingData) {
   this.findings.push({
     ...findingData,
     findingId: crypto.randomUUID(),
@@ -769,15 +884,16 @@ complianceAuditSchema.plugin(mongoosePaginate);
 encryptionKeySchema.plugin(mongoosePaginate);
 
 const SecurityEvent = mongoose.model("SecurityEvent", securityEventSchema);
-const DataPrivacyConsent = mongoose.model("DataPrivacyConsent", dataPrivacyConsentSchema);
-const ComplianceAudit = mongoose.model("ComplianceAudit", complianceAuditSchema);
+const DataPrivacyConsent = mongoose.model(
+  "DataPrivacyConsent",
+  dataPrivacyConsentSchema
+);
+const ComplianceAudit = mongoose.model(
+  "ComplianceAudit",
+  complianceAuditSchema
+);
 const EncryptionKey = mongoose.model("EncryptionKey", encryptionKeySchema);
 
-export {
-  SecurityEvent,
-  DataPrivacyConsent,
-  ComplianceAudit,
-  EncryptionKey,
-};
+export { SecurityEvent, DataPrivacyConsent, ComplianceAudit, EncryptionKey };
 
 export default SecurityEvent;

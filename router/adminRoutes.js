@@ -74,6 +74,16 @@ import {
   validateEngagementFilters,
   validateRevenueFilters,
   validateUsageFilters,
+  validateSecurityEventInvestigation,
+  validatePasswordPolicy,
+  validateForcePasswordReset,
+  validateDataSubjectRequest,
+  validateComplianceAudit,
+  validateAuditFinding,
+  validateKeyRotation,
+  validateSecurityEventFilters,
+  validateComplianceReport,
+  validateDataExport,
 } from "../middleware/validation.js";
 
 const adminRouter = express.Router();
@@ -1134,6 +1144,24 @@ import {
   createKnowledgeBaseCategory,
 } from "../controller/SupportTicketingController.js";
 
+// Security and Compliance Controllers
+import {
+  getSecurityDashboard,
+  getSecurityEvents,
+  investigateSecurityEvent,
+  updatePasswordPolicy,
+  forcePasswordReset,
+  getDataPrivacyOverview,
+  processDataSubjectRequest,
+  exportUserData,
+  createComplianceAudit,
+  getComplianceAudits,
+  addAuditFinding,
+  getEncryptionKeys,
+  rotateEncryptionKey,
+  generateComplianceReport,
+} from "../controller/SecurityComplianceController.js";
+
 // Support Dashboard
 // @route   GET /admin/support/dashboard
 // @desc    Get support dashboard with ticket statistics and metrics
@@ -1304,6 +1332,143 @@ adminRouter.post(
   "/knowledge-base/categories",
   requireAdminRole,
   createKnowledgeBaseCategory
+);
+
+// ============================================
+// SECURITY AND COMPLIANCE MANAGEMENT ROUTES
+// ============================================
+
+// Security Dashboard
+// @route   GET /admin/security/dashboard
+// @desc    Get security dashboard with metrics and alerts
+// @access  SuperAdmin/Admin
+adminRouter.get("/security/dashboard", requireAdminRole, getSecurityDashboard);
+
+// Security Event Management
+// @route   GET /admin/security/events
+// @desc    Get security events with filtering and pagination
+// @access  SuperAdmin/Admin
+adminRouter.get(
+  "/security/events",
+  requireAdminRole,
+  validateSecurityEventFilters,
+  getSecurityEvents
+);
+
+// @route   PUT /admin/security/events/:eventId/investigate
+// @desc    Investigate a security event
+// @access  SuperAdmin/Admin
+adminRouter.put(
+  "/security/events/:eventId/investigate",
+  requireAdminRole,
+  validateObjectId,
+  validateSecurityEventInvestigation,
+  investigateSecurityEvent
+);
+
+// Authentication and Authorization Management
+// @route   PUT /admin/security/password-policy
+// @desc    Update system password policy
+// @access  SuperAdmin only
+adminRouter.put(
+  "/security/password-policy",
+  requireSuperAdminRole,
+  validatePasswordPolicy,
+  updatePasswordPolicy
+);
+
+// @route   POST /admin/security/force-password-reset
+// @desc    Force password reset for multiple users
+// @access  SuperAdmin only
+adminRouter.post(
+  "/security/force-password-reset",
+  requireSuperAdminRole,
+  validateForcePasswordReset,
+  forcePasswordReset
+);
+
+// Data Privacy and Consent Management
+// @route   GET /admin/privacy/overview
+// @desc    Get data privacy overview with consent status
+// @access  SuperAdmin/Admin
+adminRouter.get("/privacy/overview", requireAdminRole, getDataPrivacyOverview);
+
+// @route   PUT /admin/privacy/data-subject-request/:userId/:requestType
+// @desc    Process data subject request (GDPR, CCPA, etc.)
+// @access  SuperAdmin/Admin
+adminRouter.put(
+  "/privacy/data-subject-request/:userId/:requestType",
+  requireAdminRole,
+  validateDataSubjectRequest,
+  processDataSubjectRequest
+);
+
+// @route   GET /admin/privacy/export-user-data/:userId
+// @desc    Export user data for compliance purposes
+// @access  SuperAdmin/Admin
+adminRouter.get(
+  "/privacy/export-user-data/:userId",
+  requireAdminRole,
+  validateDataExport,
+  exportUserData
+);
+
+// Compliance Audit Management
+// @route   POST /admin/compliance/audits
+// @desc    Create new compliance audit
+// @access  SuperAdmin/Admin
+adminRouter.post(
+  "/compliance/audits",
+  requireAdminRole,
+  validateComplianceAudit,
+  createComplianceAudit
+);
+
+// @route   GET /admin/compliance/audits
+// @desc    Get all compliance audits with filtering
+// @access  SuperAdmin/Admin
+adminRouter.get("/compliance/audits", requireAdminRole, getComplianceAudits);
+
+// @route   POST /admin/compliance/audits/:auditId/findings
+// @desc    Add finding to compliance audit
+// @access  SuperAdmin/Admin
+adminRouter.post(
+  "/compliance/audits/:auditId/findings",
+  requireAdminRole,
+  validateObjectId,
+  validateAuditFinding,
+  addAuditFinding
+);
+
+// @route   GET /admin/compliance/report
+// @desc    Generate compliance report
+// @access  SuperAdmin/Admin
+adminRouter.get(
+  "/compliance/report",
+  requireAdminRole,
+  validateComplianceReport,
+  generateComplianceReport
+);
+
+// Encryption Key Management
+// @route   GET /admin/security/encryption-keys
+// @desc    Get encryption keys with filtering
+// @access  SuperAdmin only
+adminRouter.get(
+  "/security/encryption-keys",
+  requireSuperAdminRole,
+  getEncryptionKeys
+);
+
+// @route   PUT /admin/security/encryption-keys/:keyId/rotate
+// @desc    Rotate encryption key
+// @access  SuperAdmin only
+adminRouter.put(
+  "/security/encryption-keys/:keyId/rotate",
+  requireSuperAdminRole,
+  validateObjectId,
+  validateKeyRotation,
+  rotateEncryptionKey
 );
 
 export default adminRouter;

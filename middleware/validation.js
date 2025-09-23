@@ -2417,3 +2417,608 @@ export const validateSupportAnalyticsTimeframe = (req, res, next) => {
 
   next();
 };
+
+// Security and Compliance Validation Functions
+
+// Validate security event investigation request
+export const validateSecurityEventInvestigation = (req, res, next) => {
+  const { investigationNotes, resolved, resolution } = req.body;
+  const errors = [];
+
+  if (investigationNotes && typeof investigationNotes !== "string") {
+    errors.push("Investigation notes must be a string");
+  }
+
+  if (investigationNotes && investigationNotes.length > 2000) {
+    errors.push("Investigation notes cannot exceed 2000 characters");
+  }
+
+  if (resolved !== undefined && typeof resolved !== "boolean") {
+    errors.push("Resolved field must be a boolean");
+  }
+
+  if (resolved && !resolution) {
+    errors.push("Resolution is required when marking event as resolved");
+  }
+
+  if (resolution && typeof resolution !== "string") {
+    errors.push("Resolution must be a string");
+  }
+
+  if (resolution && resolution.length > 1000) {
+    errors.push("Resolution cannot exceed 1000 characters");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid security event investigation data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate password policy update request
+export const validatePasswordPolicy = (req, res, next) => {
+  const {
+    minLength,
+    requireUppercase,
+    requireLowercase,
+    requireNumbers,
+    requireSpecialChars,
+    maxAge,
+    preventReuse,
+    lockoutThreshold,
+    lockoutDuration,
+  } = req.body;
+  const errors = [];
+
+  if (minLength !== undefined) {
+    if (!Number.isInteger(minLength) || minLength < 6 || minLength > 50) {
+      errors.push("Minimum length must be an integer between 6 and 50");
+    }
+  }
+
+  const booleanFields = [
+    "requireUppercase",
+    "requireLowercase",
+    "requireNumbers",
+    "requireSpecialChars",
+  ];
+  booleanFields.forEach((field) => {
+    if (req.body[field] !== undefined && typeof req.body[field] !== "boolean") {
+      errors.push(`${field} must be a boolean`);
+    }
+  });
+
+  if (maxAge !== undefined) {
+    if (!Number.isInteger(maxAge) || maxAge < 1 || maxAge > 365) {
+      errors.push("Max age must be an integer between 1 and 365 days");
+    }
+  }
+
+  if (preventReuse !== undefined) {
+    if (
+      !Number.isInteger(preventReuse) ||
+      preventReuse < 0 ||
+      preventReuse > 20
+    ) {
+      errors.push("Prevent reuse must be an integer between 0 and 20");
+    }
+  }
+
+  if (lockoutThreshold !== undefined) {
+    if (
+      !Number.isInteger(lockoutThreshold) ||
+      lockoutThreshold < 1 ||
+      lockoutThreshold > 20
+    ) {
+      errors.push("Lockout threshold must be an integer between 1 and 20");
+    }
+  }
+
+  if (lockoutDuration !== undefined) {
+    if (
+      !Number.isInteger(lockoutDuration) ||
+      lockoutDuration < 1 ||
+      lockoutDuration > 1440
+    ) {
+      errors.push(
+        "Lockout duration must be an integer between 1 and 1440 minutes"
+      );
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid password policy data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate force password reset request
+export const validateForcePasswordReset = (req, res, next) => {
+  const { userIds } = req.body;
+  const errors = [];
+
+  if (!userIds) {
+    errors.push("User IDs array is required");
+  } else if (!Array.isArray(userIds)) {
+    errors.push("User IDs must be an array");
+  } else if (userIds.length === 0) {
+    errors.push("At least one user ID is required");
+  } else if (userIds.length > 100) {
+    errors.push("Cannot reset passwords for more than 100 users at once");
+  } else {
+    userIds.forEach((id, index) => {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        errors.push(`Invalid user ID at index ${index}: ${id}`);
+      }
+    });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid force password reset data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate data subject request processing
+export const validateDataSubjectRequest = (req, res, next) => {
+  const { userId, requestType } = req.params;
+  const { notes, attachments } = req.body;
+  const errors = [];
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    errors.push("Invalid user ID format");
+  }
+
+  const validRequestTypes = [
+    "access",
+    "rectification",
+    "erasure",
+    "restrict_processing",
+    "data_portability",
+    "object_processing",
+    "automated_decision_opt_out",
+  ];
+
+  if (!validRequestTypes.includes(requestType)) {
+    errors.push(
+      `Invalid request type. Valid types: ${validRequestTypes.join(", ")}`
+    );
+  }
+
+  if (notes && typeof notes !== "string") {
+    errors.push("Notes must be a string");
+  }
+
+  if (notes && notes.length > 2000) {
+    errors.push("Notes cannot exceed 2000 characters");
+  }
+
+  if (attachments && !Array.isArray(attachments)) {
+    errors.push("Attachments must be an array");
+  }
+
+  if (attachments) {
+    attachments.forEach((attachment, index) => {
+      if (!attachment.filename || typeof attachment.filename !== "string") {
+        errors.push(
+          `Attachment ${index}: filename is required and must be a string`
+        );
+      }
+      if (!attachment.url || typeof attachment.url !== "string") {
+        errors.push(
+          `Attachment ${index}: url is required and must be a string`
+        );
+      }
+      if (
+        attachment.encrypted !== undefined &&
+        typeof attachment.encrypted !== "boolean"
+      ) {
+        errors.push(`Attachment ${index}: encrypted must be a boolean`);
+      }
+    });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid data subject request data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate compliance audit creation
+export const validateComplianceAudit = (req, res, next) => {
+  const {
+    auditType,
+    regulation,
+    scope,
+    startDate,
+    endDate,
+    auditTeam,
+    externalAuditor,
+  } = req.body;
+  const errors = [];
+
+  const validAuditTypes = [
+    "scheduled",
+    "incident_response",
+    "compliance_check",
+    "security_review",
+    "data_protection",
+  ];
+  if (!auditType || !validAuditTypes.includes(auditType)) {
+    errors.push(
+      `Invalid audit type. Valid types: ${validAuditTypes.join(", ")}`
+    );
+  }
+
+  const validRegulations = [
+    "GDPR",
+    "HIPAA",
+    "CCPA",
+    "SOX",
+    "PCI_DSS",
+    "ISO27001",
+    "GENERAL",
+  ];
+  if (!regulation || !validRegulations.includes(regulation)) {
+    errors.push(
+      `Invalid regulation. Valid regulations: ${validRegulations.join(", ")}`
+    );
+  }
+
+  if (!scope || typeof scope !== "string") {
+    errors.push("Scope is required and must be a string");
+  }
+
+  if (scope && scope.length > 1000) {
+    errors.push("Scope cannot exceed 1000 characters");
+  }
+
+  if (!startDate) {
+    errors.push("Start date is required");
+  } else if (isNaN(Date.parse(startDate))) {
+    errors.push("Invalid start date format");
+  }
+
+  if (endDate && isNaN(Date.parse(endDate))) {
+    errors.push("Invalid end date format");
+  }
+
+  if (endDate && startDate && new Date(endDate) <= new Date(startDate)) {
+    errors.push("End date must be after start date");
+  }
+
+  if (auditTeam && !Array.isArray(auditTeam)) {
+    errors.push("Audit team must be an array");
+  }
+
+  if (auditTeam) {
+    const validRoles = [
+      "lead_auditor",
+      "auditor",
+      "technical_expert",
+      "compliance_officer",
+    ];
+    auditTeam.forEach((member, index) => {
+      if (!member.adminId || !mongoose.Types.ObjectId.isValid(member.adminId)) {
+        errors.push(`Audit team member ${index}: invalid admin ID`);
+      }
+      if (!member.role || !validRoles.includes(member.role)) {
+        errors.push(
+          `Audit team member ${index}: invalid role. Valid roles: ${validRoles.join(
+            ", "
+          )}`
+        );
+      }
+    });
+  }
+
+  if (externalAuditor) {
+    if (typeof externalAuditor !== "object") {
+      errors.push("External auditor must be an object");
+    } else {
+      if (
+        externalAuditor.company &&
+        typeof externalAuditor.company !== "string"
+      ) {
+        errors.push("External auditor company must be a string");
+      }
+      if (
+        externalAuditor.leadAuditor &&
+        typeof externalAuditor.leadAuditor !== "string"
+      ) {
+        errors.push("External auditor lead auditor must be a string");
+      }
+      if (
+        externalAuditor.contact &&
+        typeof externalAuditor.contact !== "string"
+      ) {
+        errors.push("External auditor contact must be a string");
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid compliance audit data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate audit finding creation
+export const validateAuditFinding = (req, res, next) => {
+  const {
+    category,
+    area,
+    description,
+    evidence,
+    riskLevel,
+    recommendation,
+    assignedTo,
+    dueDate,
+  } = req.body;
+  const errors = [];
+
+  const validCategories = ["critical", "major", "minor", "observation"];
+  if (!category || !validCategories.includes(category)) {
+    errors.push(
+      `Invalid category. Valid categories: ${validCategories.join(", ")}`
+    );
+  }
+
+  if (area && typeof area !== "string") {
+    errors.push("Area must be a string");
+  }
+
+  if (!description || typeof description !== "string") {
+    errors.push("Description is required and must be a string");
+  }
+
+  if (description && description.length > 2000) {
+    errors.push("Description cannot exceed 2000 characters");
+  }
+
+  if (evidence && !Array.isArray(evidence)) {
+    errors.push("Evidence must be an array");
+  }
+
+  if (evidence) {
+    evidence.forEach((item, index) => {
+      if (typeof item !== "object") {
+        errors.push(`Evidence item ${index}: must be an object`);
+      } else {
+        if (item.type && typeof item.type !== "string") {
+          errors.push(`Evidence item ${index}: type must be a string`);
+        }
+        if (item.url && typeof item.url !== "string") {
+          errors.push(`Evidence item ${index}: url must be a string`);
+        }
+        if (item.description && typeof item.description !== "string") {
+          errors.push(`Evidence item ${index}: description must be a string`);
+        }
+      }
+    });
+  }
+
+  const validRiskLevels = ["low", "medium", "high", "critical"];
+  if (!riskLevel || !validRiskLevels.includes(riskLevel)) {
+    errors.push(
+      `Invalid risk level. Valid levels: ${validRiskLevels.join(", ")}`
+    );
+  }
+
+  if (recommendation && typeof recommendation !== "string") {
+    errors.push("Recommendation must be a string");
+  }
+
+  if (recommendation && recommendation.length > 1000) {
+    errors.push("Recommendation cannot exceed 1000 characters");
+  }
+
+  if (assignedTo && !mongoose.Types.ObjectId.isValid(assignedTo)) {
+    errors.push("Invalid assigned to ID format");
+  }
+
+  if (dueDate && isNaN(Date.parse(dueDate))) {
+    errors.push("Invalid due date format");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid audit finding data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate encryption key rotation
+export const validateKeyRotation = (req, res, next) => {
+  const { reason } = req.body;
+  const errors = [];
+
+  if (reason && typeof reason !== "string") {
+    errors.push("Reason must be a string");
+  }
+
+  if (reason && reason.length > 500) {
+    errors.push("Reason cannot exceed 500 characters");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid key rotation data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate security event filters
+export const validateSecurityEventFilters = (req, res, next) => {
+  const { eventType, severity, investigated, startDate, endDate } = req.query;
+  const errors = [];
+
+  const validEventTypes = [
+    "login_success",
+    "login_failure",
+    "logout",
+    "password_change",
+    "password_reset_request",
+    "password_reset_success",
+    "account_locked",
+    "account_unlocked",
+    "permission_denied",
+    "data_access",
+    "data_modification",
+    "data_deletion",
+    "bulk_operation",
+    "export_data",
+    "admin_escalation",
+    "suspicious_activity",
+    "security_breach_attempt",
+    "compliance_violation",
+    "audit_log_access",
+    "system_configuration_change",
+  ];
+
+  if (eventType && !validEventTypes.includes(eventType)) {
+    errors.push(
+      `Invalid event type. Valid types: ${validEventTypes.join(", ")}`
+    );
+  }
+
+  const validSeverities = ["low", "medium", "high", "critical"];
+  if (severity && !validSeverities.includes(severity)) {
+    errors.push(
+      `Invalid severity. Valid severities: ${validSeverities.join(", ")}`
+    );
+  }
+
+  if (investigated !== undefined && !["true", "false"].includes(investigated)) {
+    errors.push("Investigated must be 'true' or 'false'");
+  }
+
+  if (startDate && isNaN(Date.parse(startDate))) {
+    errors.push("Invalid start date format");
+  }
+
+  if (endDate && isNaN(Date.parse(endDate))) {
+    errors.push("Invalid end date format");
+  }
+
+  if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
+    errors.push("End date must be after start date");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid security event filters",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate compliance report generation
+export const validateComplianceReport = (req, res, next) => {
+  const { regulation, startDate, endDate, format } = req.query;
+  const errors = [];
+
+  const validRegulations = [
+    "GDPR",
+    "HIPAA",
+    "CCPA",
+    "SOX",
+    "PCI_DSS",
+    "ISO27001",
+    "GENERAL",
+  ];
+  if (regulation && !validRegulations.includes(regulation)) {
+    errors.push(
+      `Invalid regulation. Valid regulations: ${validRegulations.join(", ")}`
+    );
+  }
+
+  if (startDate && isNaN(Date.parse(startDate))) {
+    errors.push("Invalid start date format");
+  }
+
+  if (endDate && isNaN(Date.parse(endDate))) {
+    errors.push("Invalid end date format");
+  }
+
+  if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
+    errors.push("End date must be after start date");
+  }
+
+  const validFormats = ["json", "csv", "pdf"];
+  if (format && !validFormats.includes(format)) {
+    errors.push(`Invalid format. Valid formats: ${validFormats.join(", ")}`);
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid compliance report parameters",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate data export request
+export const validateDataExport = (req, res, next) => {
+  const { userId } = req.params;
+  const { format } = req.query;
+  const errors = [];
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    errors.push("Invalid user ID format");
+  }
+
+  const validFormats = ["json", "csv", "pdf"];
+  if (format && !validFormats.includes(format)) {
+    errors.push(`Invalid format. Valid formats: ${validFormats.join(", ")}`);
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid data export parameters",
+      errors,
+    });
+  }
+
+  next();
+};
