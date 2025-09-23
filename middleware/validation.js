@@ -1692,3 +1692,728 @@ export const validateContentSearch = (req, res, next) => {
 
   next();
 };
+
+// ============================================
+// SUPPORT AND TICKETING VALIDATION FUNCTIONS
+// ============================================
+
+// Validate ticket creation data
+export const validateTicketData = (req, res, next) => {
+  const { title, description, category, priority, submitterUserId } = req.body;
+  const errors = [];
+
+  // Title validation
+  if (!title || title.trim().length === 0) {
+    errors.push("Title is required");
+  } else if (title.length > 200) {
+    errors.push("Title cannot exceed 200 characters");
+  }
+
+  // Description validation
+  if (!description || description.trim().length === 0) {
+    errors.push("Description is required");
+  } else if (description.length > 2000) {
+    errors.push("Description cannot exceed 2000 characters");
+  }
+
+  // Category validation
+  const validCategories = [
+    "technical_issue",
+    "account_support",
+    "billing_inquiry",
+    "feature_request",
+    "bug_report",
+    "general_inquiry",
+    "subscription_support",
+    "content_issue",
+    "user_management",
+    "other",
+  ];
+  if (!category) {
+    errors.push("Category is required");
+  } else if (!validCategories.includes(category)) {
+    errors.push(
+      `Invalid category. Valid categories: ${validCategories.join(", ")}`
+    );
+  }
+
+  // Priority validation
+  const validPriorities = ["low", "normal", "high", "urgent", "critical"];
+  if (priority && !validPriorities.includes(priority)) {
+    errors.push(
+      `Invalid priority. Valid priorities: ${validPriorities.join(", ")}`
+    );
+  }
+
+  // Submitter validation
+  if (submitterUserId && !mongoose.Types.ObjectId.isValid(submitterUserId)) {
+    errors.push("Invalid submitter user ID format");
+  }
+
+  // Team validation
+  const { team } = req.body;
+  const validTeams = [
+    "support",
+    "technical",
+    "billing",
+    "product",
+    "management",
+  ];
+  if (team && !validTeams.includes(team)) {
+    errors.push(`Invalid team. Valid teams: ${validTeams.join(", ")}`);
+  }
+
+  // Tags validation
+  const { tags } = req.body;
+  if (tags && Array.isArray(tags)) {
+    if (tags.length > 10) {
+      errors.push("Cannot have more than 10 tags");
+    }
+    tags.forEach((tag, index) => {
+      if (typeof tag !== "string" || tag.trim().length === 0) {
+        errors.push(`Tag at index ${index} must be a non-empty string`);
+      } else if (tag.length > 50) {
+        errors.push(`Tag at index ${index} cannot exceed 50 characters`);
+      }
+    });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ticket data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate ticket update data
+export const validateTicketUpdate = (req, res, next) => {
+  const { title, description, category, priority, status, team, resolution } =
+    req.body;
+  const errors = [];
+
+  // Title validation (if provided)
+  if (title !== undefined) {
+    if (title.trim().length === 0) {
+      errors.push("Title cannot be empty");
+    } else if (title.length > 200) {
+      errors.push("Title cannot exceed 200 characters");
+    }
+  }
+
+  // Description validation (if provided)
+  if (description !== undefined) {
+    if (description.trim().length === 0) {
+      errors.push("Description cannot be empty");
+    } else if (description.length > 2000) {
+      errors.push("Description cannot exceed 2000 characters");
+    }
+  }
+
+  // Category validation (if provided)
+  const validCategories = [
+    "technical_issue",
+    "account_support",
+    "billing_inquiry",
+    "feature_request",
+    "bug_report",
+    "general_inquiry",
+    "subscription_support",
+    "content_issue",
+    "user_management",
+    "other",
+  ];
+  if (category && !validCategories.includes(category)) {
+    errors.push(
+      `Invalid category. Valid categories: ${validCategories.join(", ")}`
+    );
+  }
+
+  // Priority validation (if provided)
+  const validPriorities = ["low", "normal", "high", "urgent", "critical"];
+  if (priority && !validPriorities.includes(priority)) {
+    errors.push(
+      `Invalid priority. Valid priorities: ${validPriorities.join(", ")}`
+    );
+  }
+
+  // Status validation (if provided)
+  const validStatuses = [
+    "open",
+    "in_progress",
+    "pending_customer",
+    "pending_internal",
+    "resolved",
+    "closed",
+    "cancelled",
+  ];
+  if (status && !validStatuses.includes(status)) {
+    errors.push(`Invalid status. Valid statuses: ${validStatuses.join(", ")}`);
+  }
+
+  // Team validation (if provided)
+  const validTeams = [
+    "support",
+    "technical",
+    "billing",
+    "product",
+    "management",
+  ];
+  if (team && !validTeams.includes(team)) {
+    errors.push(`Invalid team. Valid teams: ${validTeams.join(", ")}`);
+  }
+
+  // Resolution validation (if provided)
+  const validResolutions = [
+    "solved",
+    "workaround_provided",
+    "duplicate",
+    "not_reproducible",
+    "wont_fix",
+    "by_design",
+    "user_error",
+    "cancelled_by_user",
+  ];
+  if (resolution && !validResolutions.includes(resolution)) {
+    errors.push(
+      `Invalid resolution. Valid resolutions: ${validResolutions.join(", ")}`
+    );
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ticket update data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate ticket filters
+export const validateTicketFilters = (req, res, next) => {
+  const { status, priority, category, team, sortBy } = req.query;
+  const errors = [];
+
+  const validStatuses = [
+    "open",
+    "in_progress",
+    "pending_customer",
+    "pending_internal",
+    "resolved",
+    "closed",
+    "cancelled",
+  ];
+  const validPriorities = ["low", "normal", "high", "urgent", "critical"];
+  const validCategories = [
+    "technical_issue",
+    "account_support",
+    "billing_inquiry",
+    "feature_request",
+    "bug_report",
+    "general_inquiry",
+    "subscription_support",
+    "content_issue",
+    "user_management",
+    "other",
+  ];
+  const validTeams = [
+    "support",
+    "technical",
+    "billing",
+    "product",
+    "management",
+  ];
+  const validSortFields = [
+    "timestamps.createdAt",
+    "timestamps.updatedAt",
+    "timestamps.lastActivityAt",
+    "priority",
+    "status",
+    "title",
+    "ticketNumber",
+  ];
+
+  if (status && !validStatuses.includes(status)) {
+    errors.push(`Invalid status. Valid statuses: ${validStatuses.join(", ")}`);
+  }
+
+  if (priority && !validPriorities.includes(priority)) {
+    errors.push(
+      `Invalid priority. Valid priorities: ${validPriorities.join(", ")}`
+    );
+  }
+
+  if (category && !validCategories.includes(category)) {
+    errors.push(
+      `Invalid category. Valid categories: ${validCategories.join(", ")}`
+    );
+  }
+
+  if (team && !validTeams.includes(team)) {
+    errors.push(`Invalid team. Valid teams: ${validTeams.join(", ")}`);
+  }
+
+  if (sortBy && !validSortFields.includes(sortBy)) {
+    errors.push(
+      `Invalid sort field. Valid fields: ${validSortFields.join(", ")}`
+    );
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ticket filter parameters",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate ticket assignment
+export const validateTicketAssignment = (req, res, next) => {
+  const { adminId } = req.body;
+  const errors = [];
+
+  if (!adminId) {
+    errors.push("Admin ID is required for ticket assignment");
+  } else if (!mongoose.Types.ObjectId.isValid(adminId)) {
+    errors.push("Invalid admin ID format");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ticket assignment data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate ticket message
+export const validateTicketMessage = (req, res, next) => {
+  const { content, isInternal, attachments } = req.body;
+  const errors = [];
+
+  // Content validation
+  if (!content || content.trim().length === 0) {
+    errors.push("Message content is required");
+  } else if (content.length > 2000) {
+    errors.push("Message content cannot exceed 2000 characters");
+  }
+
+  // Internal flag validation
+  if (isInternal !== undefined && typeof isInternal !== "boolean") {
+    errors.push("isInternal must be a boolean value");
+  }
+
+  // Attachments validation
+  if (attachments && Array.isArray(attachments)) {
+    if (attachments.length > 5) {
+      errors.push("Cannot attach more than 5 files");
+    }
+
+    attachments.forEach((attachment, index) => {
+      if (!attachment.filename || !attachment.url) {
+        errors.push(`Attachment at index ${index} must have filename and url`);
+      }
+      if (attachment.size && attachment.size > 10 * 1024 * 1024) {
+        // 10MB limit
+        errors.push(`Attachment at index ${index} exceeds 10MB size limit`);
+      }
+    });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ticket message data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate ticket escalation
+export const validateTicketEscalation = (req, res, next) => {
+  const { reason } = req.body;
+  const errors = [];
+
+  if (!reason || reason.trim().length === 0) {
+    errors.push("Escalation reason is required");
+  } else if (reason.length > 500) {
+    errors.push("Escalation reason cannot exceed 500 characters");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ticket escalation data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate ticket closure
+export const validateTicketClosure = (req, res, next) => {
+  const { resolution, resolutionNote } = req.body;
+  const errors = [];
+
+  const validResolutions = [
+    "solved",
+    "workaround_provided",
+    "duplicate",
+    "not_reproducible",
+    "wont_fix",
+    "by_design",
+    "user_error",
+    "cancelled_by_user",
+  ];
+
+  if (!resolution) {
+    errors.push("Resolution is required for ticket closure");
+  } else if (!validResolutions.includes(resolution)) {
+    errors.push(
+      `Invalid resolution. Valid resolutions: ${validResolutions.join(", ")}`
+    );
+  }
+
+  if (resolutionNote && resolutionNote.length > 1000) {
+    errors.push("Resolution note cannot exceed 1000 characters");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ticket closure data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate bulk ticket operations
+export const validateBulkTicketActions = (req, res, next) => {
+  const { ticketIds, updates } = req.body;
+  const errors = [];
+
+  // Ticket IDs validation
+  if (!ticketIds || !Array.isArray(ticketIds) || ticketIds.length === 0) {
+    errors.push("Ticket IDs array is required and cannot be empty");
+  } else {
+    ticketIds.forEach((id, index) => {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        errors.push(`Invalid ticket ID at index ${index}`);
+      }
+    });
+
+    if (ticketIds.length > 50) {
+      errors.push("Cannot perform bulk action on more than 50 tickets at once");
+    }
+  }
+
+  // Updates validation
+  if (!updates || typeof updates !== "object") {
+    errors.push("Updates object is required");
+  } else {
+    const allowedFields = ["status", "priority", "team", "assignedTo"];
+    const updateKeys = Object.keys(updates);
+
+    if (updateKeys.length === 0) {
+      errors.push("At least one update field is required");
+    }
+
+    updateKeys.forEach((key) => {
+      if (!allowedFields.includes(key)) {
+        errors.push(
+          `Invalid update field: ${key}. Allowed fields: ${allowedFields.join(
+            ", "
+          )}`
+        );
+      }
+    });
+
+    // Validate specific update values
+    if (updates.status) {
+      const validStatuses = [
+        "open",
+        "in_progress",
+        "pending_customer",
+        "pending_internal",
+        "resolved",
+        "closed",
+        "cancelled",
+      ];
+      if (!validStatuses.includes(updates.status)) {
+        errors.push(
+          `Invalid status. Valid statuses: ${validStatuses.join(", ")}`
+        );
+      }
+    }
+
+    if (updates.priority) {
+      const validPriorities = ["low", "normal", "high", "urgent", "critical"];
+      if (!validPriorities.includes(updates.priority)) {
+        errors.push(
+          `Invalid priority. Valid priorities: ${validPriorities.join(", ")}`
+        );
+      }
+    }
+
+    if (updates.team) {
+      const validTeams = [
+        "support",
+        "technical",
+        "billing",
+        "product",
+        "management",
+      ];
+      if (!validTeams.includes(updates.team)) {
+        errors.push(`Invalid team. Valid teams: ${validTeams.join(", ")}`);
+      }
+    }
+
+    if (
+      updates.assignedTo &&
+      !mongoose.Types.ObjectId.isValid(updates.assignedTo)
+    ) {
+      errors.push("Invalid assignedTo admin ID format");
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid bulk ticket action request",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate knowledge base article data
+export const validateKnowledgeBaseData = (req, res, next) => {
+  const { title, content, type, category } = req.body;
+  const errors = [];
+
+  // Title validation
+  if (!title || title.trim().length === 0) {
+    errors.push("Title is required");
+  } else if (title.length > 200) {
+    errors.push("Title cannot exceed 200 characters");
+  }
+
+  // Content validation
+  if (!content || content.trim().length === 0) {
+    errors.push("Content is required");
+  }
+
+  // Type validation
+  const validTypes = [
+    "article",
+    "faq",
+    "tutorial",
+    "guide",
+    "troubleshooting",
+    "video",
+    "documentation",
+  ];
+  if (type && !validTypes.includes(type)) {
+    errors.push(`Invalid type. Valid types: ${validTypes.join(", ")}`);
+  }
+
+  // Category validation
+  if (!category) {
+    errors.push("Category is required");
+  } else if (!mongoose.Types.ObjectId.isValid(category)) {
+    errors.push("Invalid category ID format");
+  }
+
+  // Excerpt validation
+  const { excerpt } = req.body;
+  if (excerpt && excerpt.length > 500) {
+    errors.push("Excerpt cannot exceed 500 characters");
+  }
+
+  // Question and answer validation for FAQ type
+  if (type === "faq") {
+    const { question, answer } = req.body;
+    if (!question || question.trim().length === 0) {
+      errors.push("Question is required for FAQ type");
+    } else if (question.length > 300) {
+      errors.push("Question cannot exceed 300 characters");
+    }
+
+    if (!answer || answer.trim().length === 0) {
+      errors.push("Answer is required for FAQ type");
+    } else if (answer.length > 2000) {
+      errors.push("Answer cannot exceed 2000 characters");
+    }
+  }
+
+  // Visibility validation
+  const { visibility } = req.body;
+  const validVisibilities = ["public", "members_only", "admin_only"];
+  if (visibility && !validVisibilities.includes(visibility)) {
+    errors.push(
+      `Invalid visibility. Valid visibilities: ${validVisibilities.join(", ")}`
+    );
+  }
+
+  // Tags validation
+  const { tags } = req.body;
+  if (tags && Array.isArray(tags)) {
+    if (tags.length > 20) {
+      errors.push("Cannot have more than 20 tags");
+    }
+    tags.forEach((tag, index) => {
+      if (typeof tag !== "string" || tag.trim().length === 0) {
+        errors.push(`Tag at index ${index} must be a non-empty string`);
+      } else if (tag.length > 50) {
+        errors.push(`Tag at index ${index} cannot exceed 50 characters`);
+      }
+    });
+  }
+
+  // SEO validation
+  const { seo } = req.body;
+  if (seo) {
+    if (seo.metaTitle && seo.metaTitle.length > 60) {
+      errors.push("Meta title cannot exceed 60 characters");
+    }
+    if (seo.metaDescription && seo.metaDescription.length > 160) {
+      errors.push("Meta description cannot exceed 160 characters");
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid knowledge base article data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate knowledge base category data
+export const validateKnowledgeBaseCategoryData = (req, res, next) => {
+  const { name, description, parentCategory } = req.body;
+  const errors = [];
+
+  // Name validation
+  if (!name || name.trim().length === 0) {
+    errors.push("Category name is required");
+  } else if (name.length > 100) {
+    errors.push("Category name cannot exceed 100 characters");
+  }
+
+  // Description validation
+  if (description && description.length > 500) {
+    errors.push("Description cannot exceed 500 characters");
+  }
+
+  // Parent category validation
+  if (parentCategory && !mongoose.Types.ObjectId.isValid(parentCategory)) {
+    errors.push("Invalid parent category ID format");
+  }
+
+  // Allowed content types validation
+  const { allowedContentTypes } = req.body;
+  if (allowedContentTypes && Array.isArray(allowedContentTypes)) {
+    const validTypes = [
+      "article",
+      "faq",
+      "tutorial",
+      "guide",
+      "troubleshooting",
+      "video",
+      "documentation",
+    ];
+    allowedContentTypes.forEach((type, index) => {
+      if (!validTypes.includes(type)) {
+        errors.push(`Invalid content type at index ${index}: ${type}`);
+      }
+    });
+  }
+
+  // Color validation
+  const { color } = req.body;
+  if (color && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color)) {
+    errors.push("Invalid color format. Use hex color codes (e.g., #FF0000)");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid knowledge base category data",
+      errors,
+    });
+  }
+
+  next();
+};
+
+// Validate analytics timeframe
+export const validateSupportAnalyticsTimeframe = (req, res, next) => {
+  const { timeframe, team, category } = req.query;
+  const errors = [];
+
+  if (timeframe && !["7", "30", "90", "365", "all"].includes(timeframe)) {
+    errors.push("Invalid timeframe. Valid values: 7, 30, 90, 365, all");
+  }
+
+  const validTeams = [
+    "support",
+    "technical",
+    "billing",
+    "product",
+    "management",
+    "all",
+  ];
+  if (team && !validTeams.includes(team)) {
+    errors.push(`Invalid team. Valid teams: ${validTeams.join(", ")}`);
+  }
+
+  const validCategories = [
+    "technical_issue",
+    "account_support",
+    "billing_inquiry",
+    "feature_request",
+    "bug_report",
+    "general_inquiry",
+    "subscription_support",
+    "content_issue",
+    "user_management",
+    "other",
+    "all",
+  ];
+  if (category && !validCategories.includes(category)) {
+    errors.push(
+      `Invalid category. Valid categories: ${validCategories.join(", ")}`
+    );
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid analytics parameters",
+      errors,
+    });
+  }
+
+  next();
+};

@@ -1106,4 +1106,204 @@ adminRouter.delete(
 // @access  SuperAdmin/Admin
 adminRouter.patch("/categories/order", requireAdminRole, updateCategoryOrder);
 
+// ============================================
+// SUPPORT AND TICKETING ROUTES
+// ============================================
+
+// Support and Ticketing Controllers
+import {
+  getSupportDashboard,
+  getAllTickets,
+  getTicketById,
+  createTicket,
+  updateTicket,
+  assignTicket,
+  addTicketMessage,
+  escalateTicket,
+  closeTicket,
+  getTicketAnalytics,
+  bulkUpdateTickets,
+  getKnowledgeBaseDashboard,
+  getAllKnowledgeBase,
+  getKnowledgeBaseById,
+  createKnowledgeBase,
+  updateKnowledgeBase,
+  deleteKnowledgeBase,
+  getFAQs,
+  getKnowledgeBaseCategories,
+  createKnowledgeBaseCategory,
+} from "../controller/SupportTicketingController.js";
+
+// Support Dashboard
+// @route   GET /admin/support/dashboard
+// @desc    Get support dashboard with ticket statistics and metrics
+// @access  SuperAdmin/Admin
+adminRouter.get("/support/dashboard", requireAdminRole, getSupportDashboard);
+
+// Ticket Management
+// @route   GET /admin/tickets
+// @desc    Get all tickets with filtering and pagination
+// @access  SuperAdmin/Admin
+adminRouter.get("/tickets", requireAdminRole, getAllTickets);
+
+// @route   GET /admin/tickets/:id
+// @desc    Get single ticket by ID
+// @access  SuperAdmin/Admin
+adminRouter.get(
+  "/tickets/:id",
+  requireAdminRole,
+  validateObjectId,
+  getTicketById
+);
+
+// @route   POST /admin/tickets
+// @desc    Create new ticket (admin can create on behalf of user)
+// @access  SuperAdmin/Admin
+adminRouter.post("/tickets", requireAdminRole, createTicket);
+
+// @route   PUT /admin/tickets/:id
+// @desc    Update ticket details
+// @access  SuperAdmin/Admin
+adminRouter.put(
+  "/tickets/:id",
+  requireAdminRole,
+  validateObjectId,
+  updateTicket
+);
+
+// @route   POST /admin/tickets/:id/assign
+// @desc    Assign ticket to admin
+// @access  SuperAdmin/Admin
+adminRouter.post(
+  "/tickets/:id/assign",
+  requireAdminRole,
+  validateObjectId,
+  assignTicket
+);
+
+// @route   POST /admin/tickets/:id/messages
+// @desc    Add message to ticket
+// @access  SuperAdmin/Admin
+adminRouter.post(
+  "/tickets/:id/messages",
+  requireAdminRole,
+  validateObjectId,
+  addTicketMessage
+);
+
+// @route   POST /admin/tickets/:id/escalate
+// @desc    Escalate ticket to higher level
+// @access  SuperAdmin/Admin
+adminRouter.post(
+  "/tickets/:id/escalate",
+  requireAdminRole,
+  validateObjectId,
+  escalateTicket
+);
+
+// @route   POST /admin/tickets/:id/close
+// @desc    Close ticket with resolution
+// @access  SuperAdmin/Admin
+adminRouter.post(
+  "/tickets/:id/close",
+  requireAdminRole,
+  validateObjectId,
+  closeTicket
+);
+
+// @route   GET /admin/tickets/analytics
+// @desc    Get ticket analytics and metrics
+// @access  SuperAdmin/Admin
+adminRouter.get("/tickets/analytics", requireAdminRole, getTicketAnalytics);
+
+// @route   PUT /admin/tickets/bulk
+// @desc    Bulk update tickets
+// @access  SuperAdmin/Admin
+adminRouter.put(
+  "/tickets/bulk",
+  requireAdminRole,
+  rateLimitBulkOperations,
+  bulkUpdateTickets
+);
+
+// ============================================
+// KNOWLEDGE BASE ROUTES
+// ============================================
+
+// Knowledge Base Dashboard
+// @route   GET /admin/knowledge-base/dashboard
+// @desc    Get knowledge base dashboard with statistics
+// @access  SuperAdmin/Admin
+adminRouter.get(
+  "/knowledge-base/dashboard",
+  requireAdminRole,
+  getKnowledgeBaseDashboard
+);
+
+// Knowledge Base Article Management
+// @route   GET /admin/knowledge-base
+// @desc    Get all knowledge base articles
+// @access  SuperAdmin/Admin
+adminRouter.get("/knowledge-base", requireAdminRole, getAllKnowledgeBase);
+
+// @route   GET /admin/knowledge-base/:id
+// @desc    Get single knowledge base article by ID
+// @access  SuperAdmin/Admin
+adminRouter.get(
+  "/knowledge-base/:id",
+  requireAdminRole,
+  validateObjectId,
+  getKnowledgeBaseById
+);
+
+// @route   POST /admin/knowledge-base
+// @desc    Create new knowledge base article
+// @access  SuperAdmin/Admin
+adminRouter.post("/knowledge-base", requireAdminRole, createKnowledgeBase);
+
+// @route   PUT /admin/knowledge-base/:id
+// @desc    Update knowledge base article
+// @access  SuperAdmin/Admin
+adminRouter.put(
+  "/knowledge-base/:id",
+  requireAdminRole,
+  validateObjectId,
+  updateKnowledgeBase
+);
+
+// @route   DELETE /admin/knowledge-base/:id
+// @desc    Delete knowledge base article
+// @access  SuperAdmin/Admin
+adminRouter.delete(
+  "/knowledge-base/:id",
+  requireAdminRole,
+  validateObjectId,
+  deleteKnowledgeBase
+);
+
+// FAQ Management
+// @route   GET /admin/faqs
+// @desc    Get all FAQs (filtered knowledge base articles)
+// @access  SuperAdmin/Admin
+adminRouter.get("/faqs", requireAdminRole, getFAQs);
+
+// Knowledge Base Category Management
+// @route   GET /admin/knowledge-base/categories
+// @desc    Get all knowledge base categories
+// @access  SuperAdmin/Admin
+adminRouter.get(
+  "/knowledge-base/categories",
+  requireAdminRole,
+  getKnowledgeBaseCategories
+);
+
+// @route   POST /admin/knowledge-base/categories
+// @desc    Create new knowledge base category
+// @access  SuperAdmin/Admin
+adminRouter.post(
+  "/knowledge-base/categories",
+  requireAdminRole,
+  createKnowledgeBaseCategory
+);
+
 export default adminRouter;
