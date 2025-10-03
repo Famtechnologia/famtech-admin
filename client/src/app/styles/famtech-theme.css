@@ -1,0 +1,139 @@
+/* FamTech Admin Theme - Green and White */
+
+/* Custom Green Shades for FamTech */
+:root {
+  --famtech-primary: #059669; /* Emerald 600 */
+  --famtech-primary-light: #10b981; /* Emerald 500 */
+  --famtech-primary-dark: #047857; /* Emerald 700 */
+  --famtech-secondary: #d1fae5; /* Emerald 100 */
+  --famtech-accent: #a7f3d0; /* Emerald 200 */
+}
+
+/* Login Page Enhancements */
+.admin-login-container {
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 50%, #f0fdf4 100%);
+}
+
+.admin-login-card {
+  box-shadow: 0 25px 50px -12px rgba(5, 150, 105, 0.25);
+}
+
+.admin-login-logo {
+  background: linear-gradient(135deg, var(--famtech-primary) 0%, var(--famtech-primary-light) 100%);
+}
+
+/* Dashboard Enhancements */
+.admin-header {
+  background: linear-gradient(90deg, #ffffff 0%, #f9fafb 100%);
+  border-bottom: 2px solid var(--famtech-secondary);
+}
+
+.stat-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 1px solid var(--famtech-secondary);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -3px rgba(5, 150, 105, 0.1), 0 4px 6px -2px rgba(5, 150, 105, 0.05);
+}
+
+.stat-icon {
+  background: linear-gradient(135deg, var(--famtech-secondary) 0%, var(--famtech-accent) 100%);
+  color: var(--famtech-primary-dark);
+}
+
+/* Button Enhancements */
+.btn-famtech-primary {
+  background: linear-gradient(135deg, var(--famtech-primary) 0%, var(--famtech-primary-light) 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-famtech-primary:hover {
+  background: linear-gradient(135deg, var(--famtech-primary-dark) 0%, var(--famtech-primary) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(5, 150, 105, 0.2);
+}
+
+/* Form Enhancements */
+.form-input-famtech:focus {
+  border-color: var(--famtech-primary);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+/* Status Badge Enhancements */
+.status-active {
+  background: var(--famtech-secondary);
+  color: var(--famtech-primary-dark);
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Loading Animations */
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-green {
+  animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Sidebar (if needed for future use) */
+.sidebar-famtech {
+  background: linear-gradient(180deg, var(--famtech-primary) 0%, var(--famtech-primary-dark) 100%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--famtech-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--famtech-primary-dark);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .admin-login-card {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+}
+
+/* Animation for page transitions */
+.page-transition {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
