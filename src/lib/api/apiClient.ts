@@ -1,8 +1,8 @@
 import axios from "axios";
 import { token } from "../api";
 
-export const API_URL = "http://localhost:4000";
-//  export const API_URL = "https://api-famtech-backend-app.onrender.com";
+// export const API_URL = "http://localhost:4000";
+ export const API_URL = "https://api-famtech-backend-app.onrender.com";
 
 const apiClient = axios.create({
   baseURL: API_URL,
