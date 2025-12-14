@@ -1,25 +1,26 @@
 {
-  "name": "famtech-admin",
-  "version": "1.0.0",
-  "main": "server.js",
-  "type": "module",
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "node server.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "crypto": "^1.0.1",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "express-rate-limit": "^7.1.5",
-    "helmet": "^7.1.0",
-    "cors": "^2.8.5",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.1",
-    "mongoose-paginate-v2": "^1.9.1"
+    "axios": "^1.13.2",
+    "lucide-react": "^0.561.0",
+    "next": "16.0.10",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.10",
+    "tailwindcss": "^4"
   }
 }
