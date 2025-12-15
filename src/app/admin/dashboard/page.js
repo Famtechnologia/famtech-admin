@@ -24,12 +24,6 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(loading);
   const [error, setError] = useState({ok: false, message: ""})
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push("/auth/login");
-    }
-  }, [isAuthenticated, loading, router]);
-
   const [users, setUsers] = useState([]);
 
   const fetchUStats = async () => {
