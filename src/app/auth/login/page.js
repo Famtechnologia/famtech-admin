@@ -64,6 +64,7 @@ export default function AdminLogin() {
 
     try {
       const response = await login(formData.email, formData.password);
+      console.log(response)
 
       if (response.ok) {
         if (formState.rememberMe) {

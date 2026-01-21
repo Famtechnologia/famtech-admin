@@ -36,7 +36,7 @@ export interface LoginPayload {
 
 export const login = async (
   email: string,
-  password: string
+  password: string,
 ): Promise<LoginResponse> => {
   try {
     const { data } = await apiClient.post<LoginResponse>(
@@ -44,7 +44,7 @@ export const login = async (
       {
         email,
         password,
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -56,6 +56,32 @@ export const login = async (
       throw new Error(message);
     }
     throw new Error("An unknown error occurred during login.");
+  }
+};
+
+export const verifyCode = async (
+  code: string,
+  email: string,
+): Promise<LoginResponse> => {
+  try {
+    const { data } = await apiClient.post<LoginResponse>(
+      "/v1/api/admin/verify-code",
+      {
+        code,
+        email,
+      },
+    );
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Verification failed";
+      throw new Error(message);
+    }
+    throw new Error("An unknown error occurred during verification.");
   }
 };
 
@@ -80,12 +106,12 @@ export interface RegisterPayload {
 }
 
 export const register = async (
-  payload: RegisterPayload
+  payload: RegisterPayload,
 ): Promise<RegisterResponse> => {
   try {
     const { data } = await apiClient.post<RegisterResponse>(
       "/auth/signup",
-      payload
+      payload,
     );
     return data;
   } catch (error) {
@@ -99,9 +125,9 @@ export const register = async (
           typeof responseData?.errors === "object" &&
           Object?.keys(responseData?.errors)?.length > 0
         ) {
-          const errorMessages = Object.values(responseData?.errors)?
-            .flat()?
-            .map((error: unknown) => {
+          const errorMessages = Object.values(responseData?.errors)
+            ?.flat()
+            ?.map((error: unknown) => {
               if (typeof error === "string") {
                 return error;
               } // Assuming the error object has a 'message' property
@@ -128,9 +154,7 @@ export const register = async (
 
 export const profile = async () => {
   try {
-    const { data } = await apiClient.get(
-      "/v1/api/admin/profile"
-    );
+    const { data } = await apiClient.get("/v1/api/admin/profile");
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -146,18 +170,76 @@ export const profile = async () => {
 
 export const getUsers = async () => {
   try {
-    const { data } = await apiClient.get(
-      "/v1/api/admin/farmers"
-    );
+    const { data } = await apiClient.get("/v1/api/admin/farmers");
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||
-        "Login failed";
+        "Failed to fetch users";
       throw new Error(message);
     }
-    throw new Error("An unknown error occurred during login.");
+    throw new Error("An unknown error occurred during fetching users.");
   }
 };
+
+export const getAllAdmins = async () => {
+  try {
+    const { data } = await apiClient.get("/v1/api/admin/admins");
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to fetch admins";
+      throw new Error(message);
+    }
+    throw new Error("An unknown error occurred while fetching admins.");
+  }
+};
+
+// Create a new admin account
+export const createAdmin = async (
+  payload: RegisterPayload,
+): Promise<RegisterResponse> => {
+  try {
+    const { data } = await apiClient.post<RegisterResponse>(
+      "/v1/api/admin/create",
+      payload,
+    );
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error?.response) {
+      const responseData = error?.response?.data;
+      let errorMessage = "Admin creation failed";
+
+      if (responseData) {
+        if (
+          responseData?.errors &&
+          typeof responseData?.errors === "object" &&
+          Object?.keys(responseData?.errors)?.length > 0
+        ) {
+          const errorMessages = Object.values(responseData?.errors)
+            ?.flat()
+            ?.map((err: unknown) => {
+              if (typeof err === "string") return err;
+              if (err && typeof err === "object" && "message" in err) {
+                const msg = (err as { message?: string }).message;
+                if (typeof msg === "string") return msg;
+              }
+              return "An unknown validation error occurred.";
+            });
+          errorMessage = errorMessages?.filter(Boolean)?.join(". ");
+        } else if (responseData?.message || responseData?.error) {
+          errorMessage = responseData?.message || responseData?.error;
+        }
+      }
+
+      throw new Error(errorMessage || "Admin creation failed");
+    }
+    throw new Error("Network error occurred");
+  }
+};
+

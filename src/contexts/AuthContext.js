@@ -48,12 +48,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
 
         const res = await profile();
-        console.log(res);
-        setUser({
-          firstName: "Admin",
-          lastName: "User",
-          role: "admin",
-        });
+        
+        setUser(res?.admin);
       } else {
         setToken(null);
         setIsAuthenticated(false);
