@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push("/admin/login");
+      router.push("/auth/login");
       return;
     }
 

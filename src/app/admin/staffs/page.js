@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { getAllAdmins } from "@/lib/api/auth";
 import FormSelect from "@/components/FormSelect";
+import Link from "next/link";
 
 export default function StaffManagement() {
   const [admins, setAdmins] = useState([]);
@@ -76,7 +77,7 @@ export default function StaffManagement() {
           admin.email?.toLowerCase().includes(searchLower) ||
           admin.firstName?.toLowerCase().includes(searchLower) ||
           admin.lastName?.toLowerCase().includes(searchLower) ||
-          admin.phone?.toLowerCase().includes(searchLower)
+          admin.phone?.toLowerCase().includes(searchLower),
       );
     }
 
@@ -233,7 +234,9 @@ export default function StaffManagement() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Admins</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Admins
+                </p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
                   {admins.length}
                 </p>
@@ -430,24 +433,27 @@ export default function StaffManagement() {
                       className="hover:bg-gray-50 transition-colors"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 flex-shrink-0">
-                            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                              <span className="text-green-600 font-medium text-sm">
-                                {admin.firstName?.charAt(0)}
-                                {admin.lastName?.charAt(0)}
-                              </span>
+                        <Link href={`/admin/staffs/${admin._id || admin.id}`}>
+                          <div className="flex items-center">
+                            <div className="h-10 w-10 flex-shrink-0">
+                              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                <span className="text-green-600 font-medium text-sm">
+                                  {admin.firstName?.charAt(0)}
+                                  {admin.lastName?.charAt(0)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {admin.firstName} {admin.lastName}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                ID:{" "}
+                                {admin._id?.slice(-6) || admin.id?.slice(-6)}
+                              </div>
                             </div>
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {admin.firstName} {admin.lastName}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              ID: {admin._id?.slice(-6) || admin.id?.slice(-6)}
-                            </div>
-                          </div>
-                        </div>
+                        </Link>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 flex items-center">
@@ -525,7 +531,8 @@ export default function StaffManagement() {
                   <span className="font-medium">
                     {Math.min(indexOfLastItem, filteredAdmins.length)}
                   </span>{" "}
-                  of <span className="font-medium">{filteredAdmins.length}</span>{" "}
+                  of{" "}
+                  <span className="font-medium">{filteredAdmins.length}</span>{" "}
                   results
                 </div>
                 <div className="flex items-center space-x-2">

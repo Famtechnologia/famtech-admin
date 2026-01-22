@@ -17,7 +17,8 @@ import {
   Settings,
   MessageSquare,
   UserCog,
-  BrickWallShield
+  BrickWallShield,
+  UserStar
 } from 'lucide-react';
 
 // Icon mapping
@@ -32,7 +33,8 @@ const iconMap = {
   Settings,
   MessageSquare,
   UserCog,
-  BrickWallShield
+  BrickWallShield,
+  UserStar
 };
 
 // Navigation configuration in JSON format - easy to extend
@@ -76,7 +78,7 @@ const navigationConfig = [
         id: 'farm-profiles',
         label: 'Farm Profiles',
         href: '/admin/farmers/farm-profiles',
-        icon: 'UserX'
+        icon: 'UserStar'
       },
       {
         id: 'farmers-analytics',
@@ -121,7 +123,7 @@ const navigationConfig = [
 
 export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
-  const [expandedGroups, setExpandedGroups] = useState({ farmers: true, 'admin-control': true });
+  const [expandedGroups, setExpandedGroups] = useState({ farmers: false, 'admin-control': false });
 
   const toggleGroup = (id) => {
     setExpandedGroups(prev => ({

@@ -27,6 +27,10 @@ export interface RegisterResponse {
     delete: boolean;
   };
   isVerified?: boolean;
+  office: string;
+  createdAt?: string;
+  role?: string;
+  updatedAt?: string;
 }
 
 export interface LoginPayload {
@@ -200,6 +204,61 @@ export const getAllAdmins = async () => {
   }
 };
 
+// Get a single admin by id
+export const getAdminById = async (id: string): Promise<RegisterResponse> => {
+  try {
+    const { data } = await apiClient.get<RegisterResponse>(
+      `/v1/api/admin/${id}`,
+    );
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to fetch admin";
+      throw new Error(message);
+    }
+    throw new Error("An unknown error occurred while fetching admin.");
+  }
+};
+
+export const verifyAdmin = async (
+  id: string,
+): Promise<{ message?: string; success?: boolean }> => {
+  try {
+    const { data } = await apiClient.post(`/v1/api/admin/verify/${id}`);
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to verify admin";
+      throw new Error(message);
+    }
+    throw new Error("An unknown error occurred while verifying admin.");
+  }
+};
+
+export const deleteAdmin = async (
+  id: string,
+): Promise<{ message?: string; success?: boolean }> => {
+  try {
+    const { data } = await apiClient.delete(`/v1/api/admin/delete/${id}`);
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to delete admin";
+      throw new Error(message);
+    }
+    throw new Error("An unknown error occurred while deleting admin.");
+  }
+};
+
 // Create a new admin account
 export const createAdmin = async (
   payload: RegisterPayload,
@@ -243,3 +302,67 @@ export const createAdmin = async (
   }
 };
 
+// Create a new admin account
+export const updateAdmin = async (
+  id: string,
+  payload: RegisterPayload,
+): Promise<RegisterResponse> => {
+  try {
+    const { data } = await apiClient.put<RegisterResponse>(
+      `/v1/api/admin/update/${id}`,
+      payload,
+    );
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error?.response) {
+      const responseData = error?.response?.data;
+      let errorMessage = "Admin update failed";
+
+      if (responseData) {
+        if (
+          responseData?.errors &&
+          typeof responseData?.errors === "object" &&
+          Object?.keys(responseData?.errors)?.length > 0
+        ) {
+          const errorMessages = Object.values(responseData?.errors)
+            ?.flat()
+            ?.map((err: unknown) => {
+              if (typeof err === "string") return err;
+              if (err && typeof err === "object" && "message" in err) {
+                const msg = (err as { message?: string }).message;
+                if (typeof msg === "string") return msg;
+              }
+              return "An unknown validation error occurred.";
+            });
+          errorMessage = errorMessages?.filter(Boolean)?.join(". ");
+        } else if (responseData?.message || responseData?.error) {
+          errorMessage = responseData?.message || responseData?.error;
+        }
+      }
+
+      throw new Error(errorMessage || "Admin update failed");
+    }
+    throw new Error("Network error occurred");
+  }
+};
+
+// Toggle admin active status
+export const toggleVerifyAdmin = async (
+  id: string,
+): Promise<{ message?: string; success?: boolean }> => {
+  try {
+    const { data } = await apiClient.put(`/v1/api/admin/toggle-active/${id}`);
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to toggle admin active status";
+      throw new Error(message);
+    }
+    throw new Error(
+      "An unknown error occurred while toggling admin active status.",
+    );
+  }
+};

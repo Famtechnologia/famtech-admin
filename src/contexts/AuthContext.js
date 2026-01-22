@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { profile } from "../lib/api/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 // Create Context
 const AuthContext = createContext();
@@ -32,6 +32,7 @@ const deleteCookie = (name) => {
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -54,13 +55,16 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         setIsAuthenticated(false);
         setUser(null);
-        router.replace("/auth/login");
+        // Avoid redirect loop when already on the login page
+        if (pathname !== "/auth/login") {
+          router.replace("/auth/login");
+        }
       }
       setLoading(false);
     };
 
     initAuth();
-  }, []);
+  }, [router, pathname]);
 
   const logout = () => {
     deleteCookie("famtech-token");
