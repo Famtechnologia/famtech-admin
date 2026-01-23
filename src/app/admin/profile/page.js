@@ -1,617 +1,397 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   User,
-  Mail,
-  Phone,
-  Building,
-  Shield,
-  Calendar,
-  Edit,
-  Save,
-  X,
+  Lock,
+  RefreshCw,
   Eye,
   EyeOff,
-  ArrowLeft,
-  RefreshCw,
+  Shield,
+  AlertCircle,
+  CheckCircle2,
+  Camera,
+  MapPin,
 } from "lucide-react";
+import { changePassword } from "@/lib/api/auth";
+import ViewCodeModal from "@/components/ViewCodeModal";
 
-export default function AdminProfile() {
-  const router = useRouter();
-  const [profile, setProfile] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+export default function ProfilePage() {
+  const { user, loading } = useAuth();
+  const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [error, setError] = useState("");
+  const [showCodeModal, setShowCodeModal] = useState(false);
 
-  // Edit states
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    department: "",
-  });
-
-  // Password change states
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
+  const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
     confirm: false,
   });
 
+  // const fetchMyProfile = useCallback(async () => {
+  //   try {
+  //     await checkUser();
+  //   } catch (error) {
+  //     console.error("Error fetching myProfile:", error);
+  //     setError("Failed to load myProfile");
+  //   }
+  // }, [checkUser]);
+
   // useEffect(() => {
-  //   fetchProfile();
-  // }, []);
+  //   fetchMyProfile();
+  // }, [fetchMyProfile]);
 
-  // const fetchProfile = async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     setError("");
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
-  //     const response = await adminAuthAPI.getProfile();
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
-  //     if (response.success) {
-  //       setProfile(response.data);
-  //       setEditForm({
-  //         firstName: response.data.firstName || "",
-  //         lastName: response.data.lastName || "",
-  //         email: response.data.email || "",
-  //         phoneNumber: response.data.phoneNumber || "",
-  //         department: response.data.department || "",
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching profile:", error);
-  //     setError("Failed to load profile data");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setError("");
+    setSuccessMessage("");
 
-  // const handleEditSubmit = async (e) => {
-  //   e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setError("New passwords do not match!");
+      setIsSaving(false);
+      return;
+    }
 
-  //   try {
-  //     setError("");
-  //     setSuccessMessage("");
+    if (passwordData.newPassword.length < 8) {
+      setError("Password must be at least 8 characters long!");
+      setIsSaving(false);
+      return;
+    }
 
-  //     const response = await adminAuthAPI.updateProfile(editForm);
+    try {
 
-  //     if (response.success) {
-  //       setProfile(response.data);
-  //       setIsEditing(false);
-  //       setSuccessMessage("Profile updated successfully!");
+      await changePassword({ oldPassword: passwordData.currentPassword, newPassword: passwordData.newPassword, confirmPassword: passwordData.confirmPassword });
 
-  //       setTimeout(() => setSuccessMessage(""), 3000);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating profile:", error);
-  //     setError(error.response?.data?.message || "Failed to update profile");
-  //   }
-  // };
+      setSuccessMessage("Password changed successfully!");
+      
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
 
-  // const handlePasswordSubmit = async (e) => {
-  //   e.preventDefault();
+    } catch (err) {
+      setError("Failed to change password. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-  //   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-  //     setError("New passwords do not match");
-  //     return;
-  //   }
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
 
-  //   if (passwordForm.newPassword.length < 8) {
-  //     setError("New password must be at least 8 characters long");
-  //     return;
-  //   }
-
-  //   try {
-  //     setError("");
-  //     setSuccessMessage("");
-
-  //     await adminAuthAPI.changePassword({
-  //       currentPassword: passwordForm.currentPassword,
-  //       newPassword: passwordForm.newPassword,
-  //     });
-
-  //     setSuccessMessage("Password changed successfully!");
-  //     setShowPasswordForm(false);
-  //     setPasswordForm({
-  //       currentPassword: "",
-  //       newPassword: "",
-  //       confirmPassword: "",
-  //     });
-
-  //     setTimeout(() => setSuccessMessage(""), 3000);
-  //   } catch (error) {
-  //     console.error("Error changing password:", error);
-  //     setError(error.response?.data?.message || "Failed to change password");
-  //   }
-  // };
-
-  // const togglePasswordVisibility = (field) => {
-  //   setShowPasswords((prev) => ({
-  //     ...prev,
-  //     [field]: !prev[field],
-  //   }));
-  // };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-green-50">
-        <div className="flex flex-col items-center space-y-4">
-          <RefreshCw className="animate-spin text-green-600" size={32} />
-          <p className="text-gray-700">Loading profile...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <RefreshCw className="animate-spin h-8 w-8 text-green-600" />
       </div>
     );
   }
 
-  if (!profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-green-50">
-        <div className="text-center">
-          <p className="text-gray-600">Profile not found</p>
-          <button
-            onClick={() => router.push("/admin/dashboard")}
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            Back to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const userLocation = user?.location
+    ? `${user.location.address}, ${user.location.city}, ${user.location.state}, ${user.location.country}`
+    : "N/A";
+
+  const userActions = user?.action
+    ? Object.entries(user.action).filter(([, value]) => value)
+    : [];
+
+  const actionColors = {
+    create: "bg-blue-100 text-blue-800",
+    read: "bg-green-100 text-green-800",
+    update: "bg-yellow-100 text-yellow-800",
+    delete: "bg-red-100 text-red-800",
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-green-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <button
-                onClick={() => router.push("/admin/dashboard")}
-                className="mr-4 p-2 text-gray-400 hover:text-gray-600 rounded-md"
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Profile Settings
-                </h1>
-                <p className="text-gray-600">Manage your account information</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <Edit size={16} className="mr-2" />
-                  Edit Profile
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Messages */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800">{error}</p>
-          </div>
-        )}
-
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         {successMessage && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-800">{successMessage}</p>
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
+            <CheckCircle2 className="h-5 w-5 text-green-600 mr-3" />
+            <p className="text-green-700">{successMessage}</p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="text-center">
-                <div className="mx-auto h-24 w-24 rounded-full bg-green-200 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-bold text-green-800">
-                    {profile.firstName?.[0]}
-                    {profile.lastName?.[0]}
-                  </span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {profile.firstName} {profile.lastName}
-                </h3>
-                <p className="text-gray-600">{profile.email}</p>
-                <div className="mt-4 flex justify-center">
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                      profile.role === "superadmin"
-                        ? "bg-purple-100 text-purple-800"
-                        : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    <Shield size={12} className="mr-1" />
-                    {profile.role === "superadmin" ? "Super Admin" : "Admin"}
-                  </span>
-                </div>
-              </div>
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-600 mr-3" />
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
 
-              <div className="mt-6 border-t border-gray-200 pt-6">
-                <dl className="space-y-3">
-                  <div>
-                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Member Since
-                    </dt>
-                    <dd className="text-sm text-gray-900 flex items-center">
-                      <Calendar size={16} className="mr-2 text-gray-400" />
-                      {new Date(profile.createdAt).toLocaleDateString()}
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Last Login
-                    </dt>
-                    <dd className="text-sm text-gray-900">
-                      {profile.lastLoginAt
-                        ? new Date(profile.lastLoginAt).toLocaleDateString()
-                        : "Never"}
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </dt>
-                    <dd className="text-sm">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          profile.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {profile.status}
-                      </span>
-                    </dd>
-                  </div>
-                </dl>
-              </div>
+        {/* Profile Header Card */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 flex flex-col md:flex-row items-center md:items-start gap-8 w-full mb-8">
+          <div className="relative">
+            <div className="h-28 w-28 rounded-full bg-gradient-to-tr from-green-300 to-green-500 flex items-center justify-center shadow-md">
+              <span className="text-3xl font-bold text-white">
+                {user?.firstName?.[0] || "A"}
+                {user?.lastName?.[0] || "D"}
+              </span>
+            </div>
+            <button className="absolute bottom-0 right-0 h-8 w-8 bg-green-600 rounded-full flex items-center justify-center text-white shadow-md hover:bg-green-700 transition-colors">
+              <Camera size={16} />
+            </button>
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="text-3xl font-bold text-gray-900">
+              {user?.firstName} {user?.lastName}
+            </h2>
+            <p className="text-gray-600 text-base mt-1">{user?.email}</p>
+            <div className="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-4">
+              <span
+                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  user?.status === "active"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                <Shield size={14} className="mr-1.5" />
+                {user?.status === "active" ? "Active" : "Inactive"}
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <User size={14} className="mr-1.5" />
+                {user?.role}
+              </span>
             </div>
           </div>
-
-          {/* Profile Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Profile Information
-                </h3>
-                {isEditing && (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => {
-                        setIsEditing(false);
-                        setEditForm({
-                          firstName: profile.firstName || "",
-                          lastName: profile.lastName || "",
-                          email: profile.email || "",
-                          phoneNumber: profile.phoneNumber || "",
-                          department: profile.department || "",
-                        });
-                      }}
-                      className="flex items-center px-3 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      <X size={16} className="mr-1" />
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleEditSubmit}
-                      className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                    >
-                      <Save size={16} className="mr-1" />
-                      Save Changes
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <form onSubmit={handleEditSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editForm.firstName}
-                        onChange={(e) =>
-                          setEditForm((prev) => ({
-                            ...prev,
-                            firstName: e.target.value,
-                          }))
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        required
-                      />
-                    ) : (
-                      <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <User size={16} className="text-gray-400 mr-2" />
-                        <span className="text-gray-900">
-                          {profile.firstName}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Name
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editForm.lastName}
-                        onChange={(e) =>
-                          setEditForm((prev) => ({
-                            ...prev,
-                            lastName: e.target.value,
-                          }))
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        required
-                      />
-                    ) : (
-                      <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <User size={16} className="text-gray-400 mr-2" />
-                        <span className="text-gray-900">
-                          {profile.lastName}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={editForm.email}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({
-                          ...prev,
-                          email: e.target.value,
-                        }))
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                      required
-                    />
-                  ) : (
-                    <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                      <Mail size={16} className="text-gray-400 mr-2" />
-                      <span className="text-gray-900">{profile.email}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      value={editForm.phoneNumber}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({
-                          ...prev,
-                          phoneNumber: e.target.value,
-                        }))
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    />
-                  ) : (
-                    <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                      <Phone size={16} className="text-gray-400 mr-2" />
-                      <span className="text-gray-900">
-                        {profile.phoneNumber || "Not provided"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Department
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editForm.department}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({
-                          ...prev,
-                          department: e.target.value,
-                        }))
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    />
-                  ) : (
-                    <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                      <Building size={16} className="text-gray-400 mr-2" />
-                      <span className="text-gray-900">
-                        {profile.department || "Not specified"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </form>
-            </div>
-
-            {/* Password Change Section */}
-            <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Password & Security
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Update your password to keep your account secure
-                  </p>
-                </div>
-                {!showPasswordForm && (
-                  <button
-                    onClick={() => setShowPasswordForm(true)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          <div className="w-full md:w-auto mt-4 md:mt-0">
+            <h3 className="text-sm font-medium text-gray-500 mb-2 text-center md:text-left">
+              Permissions
+            </h3>
+            <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+              {userActions.length > 0 ? (
+                userActions.map(([action]) => (
+                  <span
+                    key={action}
+                    className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold ${actionColors[action.toLowerCase()]}`}
                   >
-                    Change Password
-                  </button>
-                )}
-              </div>
-
-              {showPasswordForm && (
-                <form onSubmit={handlePasswordSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Current Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPasswords.current ? "text" : "password"}
-                        value={passwordForm.currentPassword}
-                        onChange={(e) =>
-                          setPasswordForm((prev) => ({
-                            ...prev,
-                            currentPassword: e.target.value,
-                          }))
-                        }
-                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => togglePasswordVisibility("current")}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPasswords.current ? (
-                          <EyeOff size={16} />
-                        ) : (
-                          <Eye size={16} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      New Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPasswords.new ? "text" : "password"}
-                        value={passwordForm.newPassword}
-                        onChange={(e) =>
-                          setPasswordForm((prev) => ({
-                            ...prev,
-                            newPassword: e.target.value,
-                          }))
-                        }
-                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        minLength={8}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => togglePasswordVisibility("new")}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPasswords.new ? (
-                          <EyeOff size={16} />
-                        ) : (
-                          <Eye size={16} />
-                        )}
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Password must be at least 8 characters long
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Confirm New Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPasswords.confirm ? "text" : "password"}
-                        value={passwordForm.confirmPassword}
-                        onChange={(e) =>
-                          setPasswordForm((prev) => ({
-                            ...prev,
-                            confirmPassword: e.target.value,
-                          }))
-                        }
-                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => togglePasswordVisibility("confirm")}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPasswords.confirm ? (
-                          <EyeOff size={16} />
-                        ) : (
-                          <Eye size={16} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowPasswordForm(false);
-                        setPasswordForm({
-                          currentPassword: "",
-                          newPassword: "",
-                          confirmPassword: "",
-                        });
-                      }}
-                      className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                    >
-                      Update Password
-                    </button>
-                  </div>
-                </form>
+                    {action.charAt(0).toUpperCase() + action.slice(1)}
+                  </span>
+                ))
+              ) : (
+                <p className="text-gray-500">No special permissions.</p>
               )}
+            </div>
+            {/* Show Code Button */}
+            <div className="mt-4 flex justify-center md:justify-start">
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors"
+                onClick={() => setShowCodeModal(true)}
+              >
+                Show Code
+              </button>
             </div>
           </div>
         </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Personal Information Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-gray-900">
+                Personal Information
+              </h2>
+              <p className="text-gray-600 text-sm">
+                Your personal and professional details.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <NameInfoRow
+                firstName={user?.firstName}
+                lastName={user?.lastName}
+              />
+              <InfoRow label="Email Address" value={user?.email} />
+              <InfoRow
+                label="Phone Number"
+                value={user?.phone || "Not provided"}
+              />
+              <InfoRow
+                label="Department"
+                value={user?.office || "Not specified"}
+              />
+              <InfoRow
+                label="Location"
+                value={userLocation}
+                icon={<MapPin size={18} />}
+              />
+            </div>
+          </div>
+
+          {/* Change Password Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-gray-900">
+                Change Password
+              </h2>
+              <p className="text-gray-600 text-sm">
+                Update your password to keep your account secure.
+              </p>
+            </div>
+            <form onSubmit={handlePasswordChange} className="space-y-4">
+              <PasswordInputField
+                label="Current Password"
+                id="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    currentPassword: e.target.value,
+                  })
+                }
+                showPassword={showPasswords.current}
+                toggleShowPassword={() => togglePasswordVisibility("current")}
+              />
+              <PasswordInputField
+                label="New Password"
+                id="newPassword"
+                value={passwordData.newPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    newPassword: e.target.value,
+                  })
+                }
+                showPassword={showPasswords.new}
+                toggleShowPassword={() => togglePasswordVisibility("new")}
+                helpText="Must be at least 8 characters"
+              />
+              <PasswordInputField
+                label="Confirm New Password"
+                id="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    confirmPassword: e.target.value,
+                  })
+                }
+                showPassword={showPasswords.confirm}
+                toggleShowPassword={() => togglePasswordVisibility("confirm")}
+              />
+              <div className="flex justify-end pt-2">
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  {isSaving ? (
+                    <>
+                      <RefreshCw className="animate-spin h-5 w-5 mr-2" />
+                      Changing...
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="h-5 w-5 mr-2" />
+                      Change Password
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
+      {/* Show Code Modal */}
+      <ViewCodeModal
+        open={showCodeModal}
+        code={user?.code || "No code available"}
+        onClose={() => setShowCodeModal(false)}
+        onCopy={() => {
+          if (user?.code) navigator.clipboard.writeText(user.code);
+        }}
+      />
     </div>
   );
 }
+
+const InfoRow = ({ label, value, icon }) => (
+  <div className="border-b border-gray-200 pb-2 flex items-center gap-2">
+    {icon && <span className="text-gray-500">{icon}</span>}
+    <div>
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-gray-900 font-medium">{value}</p>
+    </div>
+  </div>
+);
+
+const NameInfoRow = ({ firstName, lastName }) => (
+  <div className="border-b border-gray-200 pb-2 flex items-center gap-4">
+    <div className="flex-1">
+      <p className="text-sm text-gray-500">First Name</p>
+      <p className="text-gray-900 font-medium">{firstName || "N/A"}</p>
+    </div>
+    <div className="flex-1">
+      <p className="text-sm text-gray-500">Last Name</p>
+      <p className="text-gray-900 font-medium">{lastName || "N/A"}</p>
+    </div>
+  </div>
+);
+
+const PasswordInputField = ({
+  label,
+  id,
+  value,
+  onChange,
+  showPassword,
+  toggleShowPassword,
+  helpText,
+}) => (
+  <div>
+    <label
+      htmlFor={id}
+      className="block text-sm font-medium text-gray-700 mb-1"
+    >
+      {label}
+    </label>
+    <div className="relative">
+      <input
+        type={showPassword ? "text" : "password"}
+        id={id}
+        value={value}
+        onChange={onChange}
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-10"
+      />
+      <button
+        type="button"
+        onClick={toggleShowPassword}
+        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+      >
+        {showPassword ? (
+          <EyeOff className="h-5 w-5" />
+        ) : (
+          <Eye className="h-5 w-5" />
+        )}
+      </button>
+    </div>
+    {helpText && <p className="mt-1 text-xs text-gray-500">{helpText}</p>}
+  </div>
+);

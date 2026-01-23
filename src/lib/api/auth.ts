@@ -366,3 +366,66 @@ export const toggleVerifyAdmin = async (
     );
   }
 };
+
+export const updateProfile = async (
+  payload: Partial<RegisterPayload>,
+): Promise<RegisterResponse> => {
+  try {
+    const { data } = await apiClient.put<RegisterResponse>(
+      "/v1/api/admin/profile",
+      payload,
+    );
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      const responseData = error.response.data;
+      let errorMessage = "Profile update failed";
+
+      if (responseData) {
+        if (
+          responseData.errors &&
+          typeof responseData.errors === "object" &&
+          Object.keys(responseData.errors).length > 0
+        ) {
+          const errorMessages = Object.values(responseData.errors)
+            .flat()
+            .map((err: unknown) => {
+              if (typeof err === "string") return err;
+              if (err && typeof err === "object" && "message" in err) {
+                const msg = (err as { message?: string }).message;
+                if (typeof msg === "string") return msg;
+              }
+              return "An unknown validation error occurred.";
+            });
+          errorMessage = errorMessages.filter(Boolean).join(". ");
+        } else if (responseData.message || responseData.error) {
+          errorMessage = responseData.message || responseData.error;
+        }
+      }
+
+      throw new Error(errorMessage || "Profile update failed");
+    }
+    throw new Error("Network error occurred");
+  }
+};
+
+export const changePassword = async (
+  payload: any,
+): Promise<{ message?: string; success?: boolean }> => {
+  try {
+    const { data } = await apiClient.post(
+      "/v1/api/admin/change-password",
+      payload,
+    );
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to change password";
+      throw new Error(message);
+    }
+    throw new Error("An unknown error occurred while changing password.");
+  }
+};

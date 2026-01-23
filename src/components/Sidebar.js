@@ -114,6 +114,12 @@ const navigationConfig = [
     icon: 'MessageSquare'
   },
   {
+    id: 'profile',
+    label: 'Profile',
+    href: '/admin/profile',
+    icon: 'UserCog'
+  },
+  {
     id: 'settings',
     label: 'Settings',
     href: '/admin/settings',

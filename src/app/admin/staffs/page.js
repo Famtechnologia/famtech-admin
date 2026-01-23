@@ -26,7 +26,7 @@ export default function StaffManagement() {
   const [successMessage, setSuccessMessage] = useState("");
 
   // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);  
   const [itemsPerPage] = useState(20);
 
   // Filters and Search
