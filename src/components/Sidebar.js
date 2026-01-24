@@ -167,13 +167,6 @@ export default function Sidebar({ isOpen, onClose }) {
           <Shield className="h-6 w-6 text-green-600 mr-2" />
           <h2 className="text-lg font-bold text-gray-900">FamTech</h2>
         </div>
-        <button className="p-2 hover:bg-gray-50 rounded-lg transition-colors">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-gray-600">
-            <rect x="3" y="4" width="14" height="2" rx="1" fill="currentColor"/>
-            <rect x="3" y="9" width="14" height="2" rx="1" fill="currentColor"/>
-            <rect x="3" y="14" width="14" height="2" rx="1" fill="currentColor"/>
-          </svg>
-        </button>
       </div>
       
       {/* Navigation */}
@@ -258,7 +251,7 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Footer */}
       <div className="p-4 border-t border-gray-100 bg-white flex-shrink-0">
         <p className="text-xs text-gray-500 text-center">
-          © 2026 FamTech Admin
+          © {new Date().getFullYear()} FamTech Admin
         </p>
       </div>
     </aside>
