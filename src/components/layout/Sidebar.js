@@ -14,7 +14,6 @@ import {
   ChartCandlestick,
   UserCheck,
   UserX,
-  BookOpen,
   Settings,
   MessageSquare,
   UserCog,
@@ -125,7 +124,7 @@ const navigationConfig = [
     id: 'blog',
     label: 'Blog',
     href: '/admin/blog',
-    icon: 'BookOpen'
+    icon: 'UserCog'
   },
   {
     id: 'settings',

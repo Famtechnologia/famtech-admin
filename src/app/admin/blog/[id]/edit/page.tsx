@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getBlogById, updateBlog, deleteBlog } from "@/lib/api/blog";
 import { BlogFormData } from "@/types/blog.types";
-import { Save, Trash2, ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
-
+import { Save, Trash2, ArrowLeft, CheckCircle, AlertTriangle, ImageIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 const EditBlogPage = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -68,9 +69,9 @@ const EditBlogPage = () => {
   if (loading) return <div className="p-10 text-center text-green-600 font-bold">Loading Data...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12 pb-20">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex items-center gap-2 md:gap-4 mb-8">
         <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
           <ArrowLeft size={24} className="text-gray-600" />
         </button>
@@ -79,7 +80,9 @@ const EditBlogPage = () => {
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Side: The Form */}
-        <form className="flex-1 space-y-6 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+        <form className="flex-1 space-y-6 bg-white p-4 py-8 md:p-8 rounded-2xl border border-gray-100 shadow-sm">
+          
+          {/* Title */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Blog Title</label>
             <input
@@ -91,26 +94,57 @@ const EditBlogPage = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
+            {/* Author */}
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Author</label>
               <input
                 type="text"
-                className="w-full text-black p-3 border border-gray-300 rounded-lg"
+                className="w-full text-black p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                 value={formData.author}
                 onChange={(e) => setFormData({...formData, author: e.target.value})}
               />
             </div>
+            {/* Niche */}
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Niche</label>
               <input
                 type="text"
-                className="w-full text-black p-3 border border-gray-300 rounded-lg"
+                className="w-full text-black p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                 value={formData.niche}
                 onChange={(e) => setFormData({...formData, niche: e.target.value})}
               />
             </div>
           </div>
 
+          {/* Image URL & Preview Section */}
+          <div className="space-y-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+             <div>
+                <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+                   <ImageIcon size={16} className="text-green-600" /> Cover Image URL
+                </label>
+                <input
+                  type="text"
+                  className="w-full text-black p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white"
+                  placeholder="Paste image URL here..."
+                  value={formData.imageUrl}
+                  onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
+                />
+             </div>
+             
+             {formData.imageUrl && (
+                <div className="relative w-full h-40 rounded-lg overflow-hidden border border-gray-300">
+                   <img 
+                      src={formData.imageUrl} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => (e.currentTarget.src = 'https://placehold.co/600x400?text=Invalid+Image+URL')}
+                   />
+                   <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded">Live Preview</div>
+                </div>
+             )}
+          </div>
+
+          {/* Content */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Content</label>
             <textarea
@@ -120,12 +154,24 @@ const EditBlogPage = () => {
               onChange={(e) => setFormData({...formData, content: e.target.value})}
             />
           </div>
+
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="checkbox" 
+                className="accent-green-600 w-5 h-5"
+                checked={formData.isTrending} 
+                onChange={(e) => setFormData({...formData, isTrending: e.target.checked})}
+              />
+              <span className="text-sm font-semibold text-gray-600">Mark as Trending Post</span>
+            </label>
+          </div>
         </form>
 
         {/* Right Side: Fixed Action Sidebar */}
-        <div className="lg:w-72 space-y-4">
+        <div className="lg:w-72">
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm sticky top-6">
-            <h3 className="font-bold text-gray-800 mb-4">Post Settings</h3>
+            <h3 className="font-bold text-gray-800 mb-4 border-b pb-2">Post Settings</h3>
             
             <button
               onClick={handleUpdate}
@@ -140,18 +186,10 @@ const EditBlogPage = () => {
             >
               <Trash2 size={18} /> Delete Post
             </button>
-
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input 
-                   type="checkbox" 
-                   className="accent-green-600"
-                   checked={formData.isTrending} 
-                   onChange={(e) => setFormData({...formData, isTrending: e.target.checked})}
-                />
-                <span className="text-sm font-semibold text-gray-600">Trending Post</span>
-              </label>
-            </div>
+            
+            <p className="text-[10px] text-gray-400 mt-4 text-center">
+               Last updated: {new Date().toLocaleDateString()}
+            </p>
           </div>
         </div>
       </div>
@@ -169,10 +207,17 @@ const EditBlogPage = () => {
             <p className="text-gray-500 mb-6">Your changes have been saved successfully.</p>
             <button 
               onClick={() => setShowSuccessModal(false)}
-              className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700"
+              className="w-full bg-green-600 mb-3 text-white font-bold py-3 rounded-xl hover:bg-green-700"
             >
               Continue Editing
             </button>
+             <button 
+              onClick={() => router.push("/admin/blog")}
+              className="w-full bg-gray-600 mb-6 text-white font-bold py-3 rounded-xl hover:bg-gray-700"
+            >
+             Back to Posts
+            </button>
+           
           </div>
         </div>
       )}
