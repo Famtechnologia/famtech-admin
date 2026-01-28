@@ -254,7 +254,7 @@ export default function StaffManagement() {
                   Verified Admins
                 </p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
-                  {admins.filter((a) => a.isVerified).length}
+                  {admins.filter((a) => a.isActive).length}
                 </p>
               </div>
               <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -270,7 +270,7 @@ export default function StaffManagement() {
                   Unverified Admins
                 </p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
-                  {admins.filter((a) => !a.isVerified).length}
+                  {admins.filter((a) => !a.isActive).length}
                 </p>
               </div>
               <div className="h-12 w-12 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -499,7 +499,7 @@ export default function StaffManagement() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {admin.isVerified ? (
+                        {admin.isActive ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Verified

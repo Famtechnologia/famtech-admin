@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Menu, Bell, LogOut, Check, X, AlertCircle, UserPlus, Trash2, Clock } from 'lucide-react'
+import { Menu, Bell, LogOut, Check, X, AlertCircle, DoorOpen, Clock } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 const Header = ({ onMenuClick }) => {
@@ -269,7 +269,7 @@ const Header = ({ onMenuClick }) => {
                 className="p-2 text-red-400 hover:text-red-600 hover:bg-red-100 rounded-md transition-colors duration-150"
                 title="Logout"
               >
-                <LogOut size={20} />
+                <DoorOpen size={20} />
               </button>
             </div>
           </div>
