@@ -19,6 +19,7 @@ import {
   UserCog,
   BrickWallShield,
   UserStar
+  
 } from 'lucide-react';
 
 // Icon mapping
@@ -117,6 +118,12 @@ const navigationConfig = [
     id: 'profile',
     label: 'Profile',
     href: '/admin/profile',
+    icon: 'UserCog'
+  },
+  {
+    id: 'blog',
+    label: 'Blog',
+    href: '/admin/blog',
     icon: 'UserCog'
   },
   {
