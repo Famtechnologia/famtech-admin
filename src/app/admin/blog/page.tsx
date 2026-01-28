@@ -82,7 +82,7 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 md:p-8 lg:p-12 pb-20">
+    <div className="p-10 h-screen bg-gray-50 relative">
       {/* --- Header Section --- */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
         <div className="space-y-2">

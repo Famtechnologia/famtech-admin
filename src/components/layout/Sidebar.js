@@ -18,8 +18,8 @@ import {
   MessageSquare,
   UserCog,
   BrickWallShield,
-  UserStar
-  
+  UserStar,
+  Newspaper
 } from 'lucide-react';
 
 // Icon mapping
@@ -35,7 +35,8 @@ const iconMap = {
   MessageSquare,
   UserCog,
   BrickWallShield,
-  UserStar
+  UserStar,
+  Newspaper
 };
 
 // Navigation configuration in JSON format - easy to extend
@@ -124,7 +125,7 @@ const navigationConfig = [
     id: 'blog',
     label: 'Blog',
     href: '/admin/blog',
-    icon: 'UserCog'
+    icon: 'Newspaper'
   },
   {
     id: 'settings',
