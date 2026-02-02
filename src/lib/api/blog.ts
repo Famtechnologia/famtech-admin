@@ -11,6 +11,11 @@ export const getBlogById = async (id: string): Promise<Blog> => {
   return response.data;
 };
 
+export const getTrendingBlogs = async () => {
+  const response = await apiClient.get(`/api/v1/blogs/trending`);
+  return response.data;
+};
+
 
 export const createBlog = async (data: BlogFormData): Promise<Blog> => {
   const response = await apiClient.post("/api/v1/blogs/create", data);
