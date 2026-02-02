@@ -1,58 +1,42 @@
 "use client";
-import { useEditor, EditorContent } from '@tiptap/react'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import Text from '@tiptap/extension-text'
-import Heading from '@tiptap/extension-heading'
-import BulletList from '@tiptap/extension-bullet-list'
-import OrderedList from '@tiptap/extension-ordered-list'
-import ListItem from '@tiptap/extension-list-item'
-import Blockquote from '@tiptap/extension-blockquote'
-import Bold from '@tiptap/extension-bold'
-import Italic from '@tiptap/extension-italic'
-import Link from '@tiptap/extension-link'
-import Image from '@tiptap/extension-image'
-import EditorToolbar from './EditorToolBar';
 
-const Tiptap = ({ content, onChange }: { content: string, onChange: (html: string) => void }) => {
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+
+
+
+const Tiptap = ({ onChange }: { onChange: (richText: string) => void }) => {
   const editor = useEditor({
     extensions: [
-      Document,
-      Paragraph,
-      Text,
-      Bold,
-      Italic,
-      ListItem,
-      BulletList,
-      OrderedList,
-      Blockquote,
-      Heading.configure({ levels: [1, 2] }),
-      Image,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-green-600 underline cursor-pointer',
-        },
+      StarterKit.configure({
+        bulletList: { keepMarks: true, keepAttributes: false },
+        orderedList: { keepMarks: true, keepAttributes: false },
       }),
+      Underline,
+      
     ],
-    content: content,
-    immediatelyRender: false,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+    content: '',
+    onUpdate({ editor }) {
+      onChange(editor.getHTML());
     },
+    immediatelyRender: false,
     editorProps: {
       attributes: {
-        
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[300px] p-4 prose-green max-w-none',
+        // 'prose' is the magic class from Tailwind Typography
+        class: 'prose prose-sm focus:outline-none min-h-[150px] p-4 max-w-none',
       },
     },
-  })
+  });
 
   return (
-    <div className="w-full border rounded-xl overflow-hidden bg-white">
-      <EditorToolbar editor={editor} />
-      <EditorContent editor={editor} />
+    <div className="w-full border overflow-hidden bg-white text-gray-700 border-gray-200 ">
+      
+      <div className="p-3">
+        <EditorContent editor={editor} />
+      </div>
     </div>
-  )
-}
-  export default Tiptap
+  );
+};
+
+export default Tiptap;

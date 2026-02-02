@@ -89,8 +89,8 @@ export default function CreateBlogPage() {
       <div className="bg-white border-b sticky top-0 z-20 px-4 py-4 sm:px-8 flex justify-between items-center">
         <div className="flex items-center gap-4">
          
-          <h1 className="text-xl font-bold flex items-center gap-2 text-gray-800">
-            <Type className="text-green-600" size={20} /> Create New Post
+          <h1 className="text-xl font-bold flex items-left text-gray-800">
+            Create New Post
           </h1>
         </div>
         <div className="flex gap-3">
@@ -107,7 +107,7 @@ export default function CreateBlogPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Editor */}
         <div className="lg:col-span-2 space-y-6">
           {error && (
@@ -120,7 +120,7 @@ export default function CreateBlogPage() {
             <input
               type="text"
               placeholder="Post Title..."
-              className="w-full p-6 text-3xl font-bold text-black border-b border-gray-100 outline-none placeholder:text-gray-300"
+              className="w-full p-6 text-2xl font-semibold text-black border-b border-gray-100 outline-none placeholder:text-gray-300"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
@@ -175,7 +175,7 @@ export default function CreateBlogPage() {
             <input 
                 type="url"
                 placeholder="Image URL"
-                className="w-full text-sm text-gray-400 p-2 border rounded-lg outline-none focus:ring-1 focus:ring-green-500"
+                className="w-full text-sm text-gray-400 p-2 border border-gray-200 rounded-lg outline-none focus:ring-1 focus:ring-green-500"
                 value={formData.imageUrl}
                 onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
             />
