@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.5",
     "@tailwindcss/typography": "^0.5.19",
     "@tiptap/extension-blockquote": "^3.18.0",
     "@tiptap/extension-bold": "^3.18.0",
