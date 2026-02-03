@@ -19,7 +19,10 @@ import {
   UserCog,
   BrickWallShield,
   UserStar,
-  Newspaper
+  Newspaper,
+  TrendingUp,
+  Plus,
+  PlusCircle
 } from 'lucide-react';
 
 // Icon mapping
@@ -36,7 +39,9 @@ const iconMap = {
   UserCog,
   BrickWallShield,
   UserStar,
-  Newspaper
+  Newspaper,
+  TrendingUp,
+  PlusCircle
 };
 
 // Navigation configuration in JSON format - easy to extend
@@ -122,10 +127,30 @@ const navigationConfig = [
     icon: 'UserCog'
   },
   {
-    id: 'blog',
+     id: 'blog',
     label: 'Blog',
-    href: '/admin/blog',
-    icon: 'Newspaper'
+    icon: 'Newspaper',
+    group: [
+      {
+        id: 'view-all',
+        label: 'View All',
+        href: '/admin/blog',
+        icon: 'Newspaper'
+      },
+      {
+        id: 'create-post',
+        label: 'Create Post',
+        href: '/admin/blog/create',
+        icon: 'PlusCircle'
+      },
+      {
+        id: 'trending-posts',
+        label: 'Trending Posts',
+        href: '/admin/blog/trending',
+        icon: 'TrendingUp'
+      }
+
+    ]
   },
   {
     id: 'settings',

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getAllBlogs } from "@/lib/api/blog";
 import { Blog } from "@/types/blog.types";
 import BlogCard from "@/components/blog/BlogCard";
-import CreateBlogModal from "@/components/blog/CreateBlogModal";
+// CreateBlogModal from "@/components/blog/CreateBlogModal";
 import { Search, Flame, Newspaper, Plus, XCircle, Loader2, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
@@ -96,12 +96,7 @@ export default function BlogPage() {
             Manage your AgroTech insights and community stories.
           </p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-green-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-green-700 transition-all shadow-lg shadow-green-100 flex items-center gap-2"
-        >
-          <Plus size={20} /> Create Blog
-        </button>
+       
       </div>
 
       {/* --- Search Bar --- */}
@@ -126,9 +121,9 @@ export default function BlogPage() {
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-10">
+      <div className="flex flex-col lg:flex-row gap-2">
         {/* LEFT COLUMN: Main Feed (2/3) */}
-        <div className="lg:w-2/3">
+        <div className="lg:w-3/3">
           <div className="flex justify-between items-center mb-6 h-8">
             <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
               {activeSearch ? `Results for "${activeSearch}"` : "All Articles"}
@@ -147,7 +142,7 @@ export default function BlogPage() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[1, 2, 3, 4].map(n => (
                 <div key={n} className="h-80 bg-gray-50 animate-pulse rounded-3xl" />
               ))}
@@ -165,7 +160,7 @@ export default function BlogPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {blogs.map(blog => <BlogCard key={blog._id} blog={blog} />)}
               </div>
 
@@ -192,7 +187,7 @@ export default function BlogPage() {
           )}
         </div>
 
-        {/* RIGHT COLUMN: Trending Sidebar (1/3) */}
+        {/* RIGHT COLUMN: Trending Sidebar (1/3) 
         <div className="lg:w-1/3">
           <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm sticky top-6">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -243,14 +238,10 @@ export default function BlogPage() {
             </div>
           </div>
         </div>
+        */}
       </div>
 
-      {isModalOpen && (
-        <CreateBlogModal
-          onClose={() => setIsModalOpen(false)}
-          onSuccess={() => { setIsModalOpen(false); loadData(); }}
-        />
-      )}
+      
     </div>
   );
 }

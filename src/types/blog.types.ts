@@ -6,7 +6,7 @@ export interface Blog {
   niche: string;          
   author: string;        
   minuteRead: number;      
-  isTrending: boolean;     
+  views: string[];    
   createdAt: string;    
   __v?: number;            
 }
@@ -18,5 +18,5 @@ export interface BlogFormData {
   niche: string;
   author: string;
   imageUrl?: string;
-  isTrending?: boolean;
+ 
 }
