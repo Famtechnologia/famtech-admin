@@ -10,6 +10,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'ik.imagekit.io',
+        port: '',
+        pathname: '/**', // This allows all paths under the ImageKit hostname
+      },
+      {
+        protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '**',
       },
