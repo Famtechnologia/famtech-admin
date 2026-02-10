@@ -17,13 +17,10 @@ const BlogDetailPage = () => {
 
   useEffect(() => {
     const fetchBlog = async () => {
-      // 2. If already fetched, exit the function early
       if (hasFetched.current) return;
-
       try {
         const data = await getBlogById(id as string);
         setBlog(data);
-        // 3. Set the lock to true after the first successful call
         hasFetched.current = true;
       } catch (error) {
         console.error("Failed to fetch blog:", error);
@@ -40,7 +37,8 @@ const BlogDetailPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6 md:p-8 lg:p-6 pb-20">
-      {/* Navigation & Actions */}
+      
+      {/* 1. Header Navigation */}
       <div className="flex justify-between items-center mb-8">
         <Link href="/admin/blog" className="flex items-center text-gray-500 hover:text-green-600 font-medium transition-colors">
           <ChevronLeft size={20} /> Back to all posts
@@ -55,9 +53,9 @@ const BlogDetailPage = () => {
         </Link>
       </div>
 
-      {/* Hero Image */}
+      {/* 2. Hero Image Section */}
       {blog.imageUrl && (
-        <div className="relative w-full h-[450px] mb-10 rounded-lg overflow-hidden ring-1 ring-gray-200">
+        <div className="relative w-full h-[300px] md:h-[500px] mb-12 rounded-2xl overflow-hidden shadow-md ring-1 ring-gray-100">
           <Image
             src={blog.imageUrl}
             alt={blog.title}
@@ -68,65 +66,68 @@ const BlogDetailPage = () => {
         </div>
       )}
 
-      {/* Meta Header */}
-      <header className="space-y-6 mb-12">
+      {/* 3. Article Metadata */}
+      <header className="mb-12">
+        <div className="flex items-center gap-2 mb-4">
+           <span className="bg-green-100 text-green-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+            {blog.niche}
+          </span>
+        </div>
 
-        <span className="bg-green-100 text-green-600 lowercase px-3 py-1 rounded-lg">{blog.niche}</span>
-
-        <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mt-3 uppercase ">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-8">
           {blog.title}
         </h1>
 
-        <div className="flex items-center gap-6 pt-6 border-t border-gray-100">
+        <div className="flex flex-wrap items-center gap-8 py-6 border-y border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700">
+            <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-600">
               <User size={20} />
             </div>
             <div>
-              <p className="text-xs text-gray-400 font-semibold">Author</p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Author</p>
               <p className="text-sm font-bold text-gray-800">{blog.author}</p>
-
             </div>
           </div>
+
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
+            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
               <Clock size={20} />
             </div>
             <div>
-              <p className="text-xs text-gray-400 font-semibold">Reading time</p>
-              <p className="text-sm font-bold text-gray-800">{blog.minuteRead} min read</p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Read Time</p>
+              <p className="text-sm font-bold text-gray-800">{blog.minuteRead} min</p>
             </div>
           </div>
-          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
-            <Eye size={20} />
-          </div>
-          <div>
-            <p className="text-xs text-gray-400  font-semibold">Views</p>
-            <p className="text-sm font-bold text-gray-800">{blog.views?.length || 0}</p>
 
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center text-purple-600">
+              <Eye size={20} />
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Views</p>
+              <p className="text-sm font-bold text-gray-800">{blog.views?.length || 0}</p>
+            </div>
           </div>
-
 
           {blog.views?.length >= 10 && (
-            <span className="text-[10px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider animate-pulse">
-              <Flame size={20} />
-            </span>
+            <div className="ml-auto flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full ring-1 ring-orange-200">
+              <Flame size={18} className="animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-tighter">Trending Now</span>
+            </div>
           )}
         </div>
       </header>
 
-      {/* --- TIPTAP CONTENT RENDERER --- */}
+     
+      {/* 
+           used "tiptap" class to apply your globals.css (tables, quotes, tasks).
+           used "prose" to handle basic typography and spacing.
+      */}
       <article
-        className="prose prose-lg md:prose-xl prose-green max-w-none text-gray-800 leading-relaxed 
-             prose-headings:font-bold prose-headings:text-gray-900
-             prose-p:mb-6 prose-li:my-1
-             prose-img:rounded-2xl prose-img:shadow-lg
-             /* Add these link styles */
-             prose-a:text-green-600 prose-a:no-underline hover:prose-a:underline prose-a:font-semibold
-             /* Fix for the green bar (Horizontal Rule) */
-             prose-hr:border-t-2 prose-hr:border-gray-200 prose-hr:my-8"
+        className="tiptap prose prose-lg md:prose-xl max-w-none text-gray-800"
         dangerouslySetInnerHTML={{ __html: blog.content }}
       />
+
     </div>
   );
 };
