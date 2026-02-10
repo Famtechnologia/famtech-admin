@@ -8,6 +8,13 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+{
+        protocol: 'https',
+        hostname: 'www.agrirs.co.uk',
+        port: '',
+        pathname: '/**', // This allows all paths from this domain
+      },
+    
     ], }
 };
 

@@ -44,7 +44,7 @@ body {
     margin-top: 2rem;
     margin-bottom: 1rem;
     color: #111827;
-    font:capitalize;
+    text-transform: capitalize;
     /* Gray 900 */
   }
 
@@ -57,16 +57,18 @@ body {
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
     color: #1f2937;
-    font:capitalize;
+    text-transform: capitalize;
     /* Gray 800 */
   }
 
 
   a {
     color: #16a34a;
-    /* Your green-600 */
     text-decoration: underline;
     font-weight: 500;
+    word-break: break-word;
+    /* Prevents long URLs from overflowing the container */
+    cursor: pointer;
   }
 
   ul {
@@ -81,29 +83,36 @@ body {
     margin: 1rem 0;
   }
 
-  
 
   img {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 1.5rem auto;
+    /* Centers and adds vertical breathing room */
+    max-width: 100%;
+    /* Crucial: ensures image never exceeds editor width */
+    height: auto;
+    /* Maintains aspect ratio */
     border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
   }
-  
+
+  /* When the user clicks the image in the editor */
   img.ProseMirror-selectednode {
     outline: 3px solid #16a34a;
+    box-shadow: 0 0 15px rgba(22, 163, 74, 0.3);
   }
 
   table {
     border-collapse: collapse;
-    table-layout: fixed;
+    table-layout: auto;
     width: 100%;
     margin: 2rem 0;
     overflow: hidden;
     border: 1px solid #e2e8f0;
   }
 
-  td, th {
+  td,
+  th {
     min-width: 1em;
     border: 1px solid #e2e8f0;
     padding: 8px 12px;
@@ -119,13 +128,163 @@ body {
   }
 
   blockquote {
-    border-left: 6px solid #16a34a; /* Deep green */
-    background-color: #f0fdf4; /* Very light green */
-    padding: 1.25rem;
+    border-left: 4px solid #16a34a;
+    background-color: #f0fdf4;
+    padding: 1rem 1.5rem;
     margin: 1.5rem 0;
     border-radius: 0 0.5rem 0.5rem 0;
     color: #166534;
-    font-weight: 500;
+    font-style: italic;
+    line-height: 1;
   }
 
+  blockquote::before,
+  blockquote::after {
+    content: none;
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid #e2e8f0;
+    margin: 2rem 0;
+    cursor: pointer;
+  }
+
+  hr.ProseMirror-selectednode {
+    border-top: 2px solid #16a34a;
+    outline: none;
+  }
+
+  /* Task List Container */
+ ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+/* Individual Task Item */
+ ul[data-type="taskList"] li {
+  display: flex;
+  align-items: center; 
+  gap:0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* The Checkbox Wrapper */
+ul[data-type="taskList"] li > label {
+ display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* The Actual Checkbox Input */
+ul[data-type="taskList"] input[type="checkbox"] {
+  cursor: pointer;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: #16a34a;
+}
+
+ul[data-type="taskList"] input[type="checkbox"]:hover {
+  border-color: #16a34a; /* Green 600 */
+}
+
+ul[data-type="taskList"] input[type="checkbox"]:checked {
+  background-color: #16a34a;
+  border-color: #16a34a;
+}
+
+/* The "Check" mark inside the box */
+ul[data-type="taskList"] input[type="checkbox"]::before {
+  content: "";
+  width: 0.65rem;
+  height: 0.65rem;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1rem 1rem #fff;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+ul[data-type="taskList"] input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+/* The Text Content */
+ul[data-type="taskList"] li > div {
+  margin: 0;
+}
+
+/* Strike-through text when checked */
+ul[data-type="taskList"] li[data-checked="true"] > div {
+  color: #9ca3af; /* Gray 400 */
+  text-decoration: line-through;
+}
+
+}
+
+/* Ensure links are visible in the rendered blog */
+.prose a {
+  color: #16a34a !important; /* FamTech Green */
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* Remove that annoying thick green bar from <hr> */
+.prose hr {
+  height: 2px;
+  background-color: #e5e7eb; /* Gray 200 */
+  border: none;
+  margin: 2rem 0;
+}
+
+/* Make sure Task Lists show checkboxes in the detail page */
+.prose ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+
+.prose ul[data-type="taskList"] li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prose ul[data-type="taskList"] input[type="checkbox"] {
+  pointer-events: none; /* Make it read-only on the detail page */
+  accent-color: #16a34a;
+}
+
+/* Tooltip Container */
+[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Tooltip Text */
+[data-tooltip]:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background-color: #1f2937;
+  /* Dark Gray */
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+/* Show Tooltip on Hover */
+[data-tooltip]:hover:before {
+  opacity: 1;
+  visibility: visible;
 }

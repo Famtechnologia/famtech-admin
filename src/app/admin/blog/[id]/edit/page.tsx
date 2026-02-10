@@ -4,10 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getBlogById, updateBlog, deleteBlog } from "@/lib/api/blog";
 import { BlogFormData } from "@/types/blog.types";
-import { Save, Trash2, ArrowLeft, CheckCircle, AlertTriangle, ImageIcon, Type } from "lucide-react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import EditorToolbar from "@/components/blog/EditorToolBar"; // Reusing your toolbar
+import { Save, Trash2, ArrowLeft, CheckCircle, AlertTriangle, ImageIcon } from "lucide-react";
+import Tiptap from "@/components/blog/Editor"; // Import the shared component
 
 const EditBlogPage = () => {
   const { id } = useParams();
@@ -23,25 +21,9 @@ const EditBlogPage = () => {
     niche: "",
     author: "",
     imageUrl: "",
-    
   });
 
-  // 1. Initialize Tiptap
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: "", // Starts empty, will be set in useEffect
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[500px] p-6 text-black max-w-none",
-      },
-    },
-    onUpdate: ({ editor }) => {
-      setFormData((prev) => ({ ...prev, content: editor.getHTML() }));
-    },
-  });
-
-  // 2. Fetch Data and set Editor Content
+  // Fetch Data
   useEffect(() => {
     const loadBlog = async () => {
       try {
@@ -52,21 +34,15 @@ const EditBlogPage = () => {
           niche: data.niche,
           author: data.author,
           imageUrl: data.imageUrl || "",
-          
         });
-
-        // Crucial: Push the fetched content into the editor
-        if (editor && data.content) {
-          editor.commands.setContent(data.content);
-        }
       } catch (error) {
         console.error("Failed to load blog");
       } finally {
         setLoading(false);
       }
     };
-    if (id && editor) loadBlog();
-  }, [id, editor]);
+    if (id) loadBlog();
+  }, [id]);
 
   const handleUpdate = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -89,10 +65,10 @@ const EditBlogPage = () => {
     }
   };
 
-  if (loading) return <div className="p-10 text-center text-green-600 font-bold animate-pulse">Loading Data...</div>;
+  if (loading) return <div className="p-10 text-center text-green-600 font-bold animate-pulse text-black">Loading Data...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12 pb-20">
+    <div className="max-w-6xl mx-auto p-4 md:p-8 lg:p-8 lg:px-4 pb-20 text-black">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
@@ -108,7 +84,7 @@ const EditBlogPage = () => {
           {/* Main Editor Card */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-50">
-              <label className="text-xs font-bold text-gray-400 tracking-wider">Blog Title</label>
+              <label className="text-xs font-bold text-gray-400 tracking-wider uppercase">Blog Title</label>
               <input
                 type="text"
                 className="w-full text-2xl font-bold text-black mt-1 outline-none placeholder:text-gray-300"
@@ -118,14 +94,14 @@ const EditBlogPage = () => {
               />
             </div>
 
-            {/* Tiptap Integration */}
-            <EditorToolbar editor={editor} />
-            <div className="bg-white">
-              <EditorContent editor={editor} />
-            </div>
+            {/* Using the Shared Tiptap Component */}
+            <Tiptap 
+              initialContent={formData.content} 
+              onChange={(html) => setFormData({ ...formData, content: html })} 
+            />
           </div>
 
-          {/* Image & Details Sections below the editor */}
+          {/* Details Sections */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              <div className="space-y-4 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
@@ -145,7 +121,7 @@ const EditBlogPage = () => {
              <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-xs font-bold text-gray-400">Author</label>
+                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Author</label>
                         <input
                             type="text"
                             className="w-full text-black p-2 border-b outline-none focus:border-green-500"
@@ -154,7 +130,7 @@ const EditBlogPage = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-gray-400 ">Niche</label>
+                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Niche</label>
                         <input
                             type="text"
                             className="w-full text-black p-2 border-b outline-none focus:border-green-500"
@@ -163,7 +139,6 @@ const EditBlogPage = () => {
                         />
                     </div>
                 </div>
-              
              </div>
           </div>
         </div>
@@ -189,113 +164,52 @@ const EditBlogPage = () => {
       </div>
 
       {/* --- MODALS --- */}
-
-
-
-      {/* 1. Success Modal */}
-
       {showSuccessModal && (
-
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 text-black">
           <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
-
             <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-
               <CheckCircle size={32} className="text-green-600" />
-
             </div>
-
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Updated!</h2>
-
             <p className="text-gray-500 mb-6">Your changes have been saved successfully.</p>
-
             <button 
-
               onClick={() => setShowSuccessModal(false)}
-
               className="w-full bg-green-600 mb-3 text-white font-bold py-3 rounded-xl hover:bg-green-700"
-
             >
-
               Continue Editing
-
             </button>
-
              <button 
-
               onClick={() => router.push("/admin/blog")}
-
-              className="w-full bg-gray-600 mb-6 text-white font-bold py-3 rounded-xl hover:bg-gray-700"
-
+              className="w-full bg-gray-600 text-white font-bold py-3 rounded-xl hover:bg-gray-700"
             >
-
-             Back to Posts
-
+              Back to Posts
             </button>
-
-           
-
           </div>
-
         </div>
-
       )}
 
-
-
-      {/* 2. Delete Confirmation Modal */}
-
       {showDeleteModal && (
-
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 text-black">
           <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
-
             <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-
               <AlertTriangle size={32} className="text-red-600" />
-
             </div>
-
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Delete Post?</h2>
-
             <p className="text-gray-500 mb-6">This action cannot be undone. Are you sure you want to proceed?</p>
-
             <div className="flex gap-3">
-
-              <button 
-
-                onClick={() => setShowDeleteModal(false)}
-
-                className="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl"
-
-              >
-
+              <button onClick={() => setShowDeleteModal(false)} className="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl">
                 No, Keep it
-
               </button>
-
               <button 
-
-                onClick={confirmDelete}
-
-                disabled={isDeleting}
-
+                onClick={confirmDelete} 
+                disabled={isDeleting} 
                 className="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-700 disabled:bg-red-300"
-
               >
-
                 {isDeleting ? "Deleting..." : "Yes, Delete"}
-
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       )}
     </div>
   );
