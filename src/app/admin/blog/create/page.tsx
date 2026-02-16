@@ -3,25 +3,25 @@ import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createBlog } from "@/lib/api/blog";
 import Tiptap from "@/components/blog/Editor";
-import { 
-  FolderOpen, 
-  Image as ImageIcon, 
-  AlertCircle, 
-  CheckCircle2, 
+import {
+  FolderOpen,
+  Image as ImageIcon,
+  AlertCircle,
+  CheckCircle2,
   Clock,
   Plus,
   X
 } from "lucide-react";
 
 const NICHES = [
-  'Agro', 'Agrotech', 'Poultry', 'Livestock', 'Crop Science', 
+  'Agro', 'Agrotech', 'Poultry', 'Livestock', 'Crop Science',
   'Sustainability', 'Farm Machinery', 'Fishery', 'Agribusiness', 'Food Security'
 ];
 
 export default function CreateBlogPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
@@ -48,7 +48,7 @@ export default function CreateBlogPage() {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setSelectedFiles((prev) => [...prev, ...files]);
-      
+
       const newPreviews = files.map(file => URL.createObjectURL(file));
       setPreviews((prev) => [...prev, ...newPreviews]);
     }
@@ -70,19 +70,19 @@ export default function CreateBlogPage() {
     setError(null);
 
     try {
-      // Use FormData to match CropRecord pattern
+      // Use FormData 
       const data = new FormData();
       data.append("title", formData.title);
       data.append("content", formData.content);
       data.append("niche", formData.niche);
-      
+
       // Append files as 'blogImages' to match your backend multer config
       selectedFiles.forEach((file) => {
         data.append("blogImages", file);
       });
 
       await createBlog(data);
-      
+
       setShowSuccessToast(true);
       setTimeout(() => router.push("/admin/blog"), 2000);
     } catch (err: any) {
@@ -101,7 +101,7 @@ export default function CreateBlogPage() {
           <button onClick={() => router.back()} className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-all">
             Discard
           </button>
-          <button 
+          <button
             onClick={handleSubmit}
             disabled={loading}
             className="px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 disabled:bg-gray-300 transition-all flex items-center gap-2"
@@ -128,13 +128,13 @@ export default function CreateBlogPage() {
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
 
-            <Tiptap 
-                initialContent={formData.content} 
-                onChange={handleContentChange} 
+            <Tiptap
+              initialContent={formData.content}
+              onChange={handleContentChange}
             />
 
             <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
-               <span className="text-xs font-bold text-gray-400 flex items-center gap-1.5 uppercase tracking-widest">
+              <span className="text-xs font-bold text-gray-400 flex items-center gap-1.5 uppercase tracking-widest">
                 <Clock size={14} /> {previewRead} min read
               </span>
             </div>
@@ -145,12 +145,12 @@ export default function CreateBlogPage() {
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
             <h3 className="font-bold text-gray-800 border-b pb-2 text-sm uppercase tracking-wider">Post Details</h3>
-            
+
             <div>
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Niche</label>
               <div className="flex items-center gap-2 border rounded-lg p-2 bg-gray-50">
                 <FolderOpen size={16} className="text-gray-400" />
-                <select 
+                <select
                   className="bg-transparent outline-none w-full text-sm text-black font-medium cursor-pointer"
                   value={formData.niche}
                   onChange={(e) => setFormData({ ...formData, niche: e.target.value })}
@@ -165,14 +165,14 @@ export default function CreateBlogPage() {
 
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
             <h3 className="font-bold text-gray-800 border-b pb-2 flex items-center gap-2 text-sm uppercase tracking-wider">
-                <ImageIcon size={18} className="text-green-600" /> blog images
+              <ImageIcon size={18} className="text-green-600" /> blog images
             </h3>
-            
-            <input 
-              type="file" 
-              multiple 
-              accept="image/*" 
-              className="hidden" 
+
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              className="hidden"
               ref={fileInputRef}
               onChange={handleFileChange}
             />
@@ -181,7 +181,7 @@ export default function CreateBlogPage() {
               {previews.map((src, idx) => (
                 <div key={idx} className="relative group rounded-lg overflow-hidden border aspect-square">
                   <img src={src} alt="Preview" className="w-full h-full object-cover" />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => removeImage(idx)}
                     className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
@@ -190,8 +190,8 @@ export default function CreateBlogPage() {
                   </button>
                 </div>
               ))}
-              
-              <button 
+
+              <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="border-2 border-dashed border-gray-200 rounded-lg aspect-square flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-green-600 hover:border-green-600 hover:bg-green-50 transition-all"
@@ -205,7 +205,7 @@ export default function CreateBlogPage() {
       </div>
 
       {showSuccessToast && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[70] bg-gray-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[70] bg-green-600 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div className="bg-green-500 p-1 rounded-full">
             <CheckCircle2 size={18} className="text-white" />
           </div>

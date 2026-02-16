@@ -14,7 +14,7 @@ const NICHES = [
 
 const EditBlogPage = () => {
   const params = useParams();
-  const id = params?.id as string; // Ensure id is captured correctly
+  const id = params?.id as string; 
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

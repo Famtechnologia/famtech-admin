@@ -2,16 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
-import { Blog } from "../../types/blog.types";
+import { Blog, Author } from "../../types/blog.types";
 import Image from "next/image";
 import { Eye, Flame, User, Clock, ImageIcon } from "lucide-react";
+import { getBlogCover } from "@/lib/utils/blogUtils"; 
 
 interface BlogCardProps {
   blog: Blog;
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
-  // 1. Logic to strip HTML tags before truncating
+ 
   const truncateContent = (html: string, limit: number = 120): string => {
     if (!html) return "";
     const plainText = html.replace(/<[^>]*>/g, "");
@@ -26,29 +27,21 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
     return text.slice(0, limit).trim() + "...";
   };
 
-  /**
-   * DATA RESOLUTION LOGIC
-   */
   
-  // Resolve Image: Use gallery first, then fallback
-  const displayImage = (blog.blogImages && blog.blogImages.length > 0) 
-    ? blog.blogImages[0].url 
-    : blog.imageUrl;
+  // Resolve Image: Uses the central utility that handles arrays and niche fallbacks
+  const displayImage = getBlogCover(blog);
 
-  // Resolve Author Safely: Fixed null/undefined check
+  // Resolve Author Safely: Fixed null/undefined check for populated objects
   const resolveAuthor = () => {
-    // If author is an object and NOT null
-    if (blog.author && typeof blog.author === 'object') {
-      const first = blog.author.firstName || "";
-      const last = blog.author.lastName || "";
-      const name = `${first} ${last}`.trim();
+    const author = blog.author;
+    if (author && typeof author === 'object' && 'firstName' in author) {
+      const { firstName, lastName } = author as Author;
+      const name = `${firstName || ""} ${lastName || ""}`.trim();
       return name || "Famtech Team";
     }
-    // If author is already a string
-    if (typeof blog.author === 'string' && blog.author.trim() !== "") {
-      return blog.author;
+    if (typeof author === 'string' && author.trim() !== "") {
+      return author;
     }
-    // Fallback for null, undefined, or empty
     return "Famtech Team";
   };
 
@@ -66,7 +59,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
           <Image
             src={displayImage}
             alt={blog.title}
-            fill
+            fill 
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (

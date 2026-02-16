@@ -27,15 +27,16 @@ body {
 }
 
 .tiptap {
+
   /* --- HEADINGS --- */
   h1 {
-    font-size: 2.5rem; 
+    font-size: 2.5rem;
     font-weight: 800;
     line-height: 1.2;
     margin-top: 2.5rem;
     margin-bottom: 1.25rem;
     color: #111827;
-    letter-spacing: -0.025em; 
+    letter-spacing: -0.025em;
     /* Removed text-transform: capitalize to stop the "ick" */
   }
 
@@ -46,17 +47,17 @@ body {
     margin-top: 2rem;
     margin-bottom: 1rem;
     color: #1f2937;
-    border-bottom: 1px solid #f3f4f6; 
+    border-bottom: 1px solid #f3f4f6;
     padding-bottom: 0.5rem;
     /* Removed text-transform: capitalize */
   }
 
   /* --- PARAGRAPHS --- */
   p {
-    margin-top: 0; 
+    margin-top: 0;
     margin-bottom: 1.25rem;
-    line-height: 1.75; 
-    color: #374151; 
+    line-height: 1.75;
+    color: #374151;
   }
 
   /* --- IMAGES & GRID LOGIC --- */
@@ -71,11 +72,12 @@ body {
 
   img {
     display: block;
-    flex: 1 1 300px; /* Allows images to grow and shrink into a grid */
+    flex: 1 1 300px;
+    /* Allows images to grow and shrink into a grid */
     margin: 0 auto;
     max-width: 100%;
-    max-height: 400px; 
-    object-fit: cover; 
+    max-height: 400px;
+    object-fit: cover;
     height: auto;
     border-radius: 0.5rem;
     transition: transform 0.2s ease;
@@ -118,7 +120,8 @@ body {
     border: 1px solid #e2e8f0;
   }
 
-  td, th {
+  td,
+  th {
     min-width: 1em;
     border: 1px solid #e2e8f0;
     padding: 8px 12px;
@@ -172,12 +175,12 @@ body {
 
   ul[data-type="taskList"] li {
     display: flex;
-    align-items: center; 
+    align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
 
-  ul[data-type="taskList"] li > label {
+  ul[data-type="taskList"] li>label {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -196,7 +199,7 @@ body {
     transform: scale(1);
   }
 
-  ul[data-type="taskList"] li[data-checked="true"] > div {
+  ul[data-type="taskList"] li[data-checked="true"]>div {
     color: #9ca3af;
     text-decoration: line-through;
   }
@@ -261,5 +264,6 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #10b981; /* Restored Green for hover */
+  background: #10b981;
+  
 }

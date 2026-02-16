@@ -3,10 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import { Table } from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
@@ -29,17 +26,11 @@ const Tiptap = ({ initialContent = '', onChange }: TiptapProps) => {
         bulletList: { keepMarks: true },
         orderedList: { keepMarks: true },
         heading: { levels: [1, 2, 3] },
-      }),
-      Underline,
-      Link.configure({
-        openOnClick: false,
-        autolink: true,
-        HTMLAttributes: { class: 'text-green-600 underline cursor-pointer' },
+
       }),
       Image.configure({
         HTMLAttributes: { class: 'rounded-xl border border-gray-200 max-w-full h-auto mx-auto' },
       }),
-      HorizontalRule,
       Table.configure({ resizable: false }),
       TableRow, TableHeader, TableCell,
       TaskList,
@@ -52,7 +43,6 @@ const Tiptap = ({ initialContent = '', onChange }: TiptapProps) => {
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        // removed min-h and added p-10 for a "page" feel
         class: 'tiptap prose prose-sm sm:prose lg:prose-lg focus:outline-none p-10 text-black max-w-none mx-auto min-h-full',
       },
     },
@@ -73,7 +63,7 @@ const Tiptap = ({ initialContent = '', onChange }: TiptapProps) => {
   return (
     <div className="w-full border bg-gray-50 border-gray-200 shadow-sm rounded-lg flex flex-col overflow-hidden">
       {/* Tab Header */}
-      <div className="flex items-end border-b border-gray-200 bg-gray-50/50 shrink-0"> 
+      <div className="flex items-end border-b border-gray-200 bg-gray-50/50 shrink-0">
         <button type="button" onClick={() => setActiveTab('write')} className={tabClass('write')}>Write</button>
         <button type="button" onClick={() => setActiveTab('preview')} className={tabClass('preview')}>Preview</button>
       </div>
@@ -82,7 +72,7 @@ const Tiptap = ({ initialContent = '', onChange }: TiptapProps) => {
         <div className="flex flex-col flex-1">
           {/* 1. The Toolbar stays at the top */}
           <EditorToolbar editor={editor} />
-          
+
           {/* 2. The Content area scrolls internally */}
           <div className="bg-white overflow-y-auto h-[500px] border-t border-gray-100">
             <EditorContent editor={editor} />
