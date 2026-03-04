@@ -20,7 +20,10 @@ import {
   BrickWallShield,
   UserStar,
   Newspaper,
-  ClipboardClock
+  ClipboardClock,
+  TrendingUp,
+  Plus,
+  PlusCircle
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -39,7 +42,9 @@ const iconMap = {
   BrickWallShield,
   UserStar,
   Newspaper,
-  ClipboardClock
+  ClipboardClock,
+  TrendingUp,
+  PlusCircle
 };
 
 // Navigation configuration in JSON format - easy to extend
@@ -144,10 +149,30 @@ const navigationConfig = [
     icon: 'UserCog'
   },
   {
-    id: 'blog',
+     id: 'blog',
     label: 'Blog',
-    href: '/admin/blog',
-    icon: 'Newspaper'
+    icon: 'Newspaper',
+    group: [
+      {
+        id: 'view-all',
+        label: 'View All',
+        href: '/admin/blog',
+        icon: 'Newspaper'
+      },
+      {
+        id: 'create-post',
+        label: 'Create Post',
+        href: '/admin/blog/create',
+        icon: 'PlusCircle'
+      },
+      {
+        id: 'trending-posts',
+        label: 'Trending Posts',
+        href: '/admin/blog/trending',
+        icon: 'TrendingUp'
+      }
+
+    ]
   },
   {
     id: 'settings',

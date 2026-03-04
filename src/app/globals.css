@@ -25,3 +25,245 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.tiptap {
+
+  /* --- HEADINGS --- */
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+    color: #111827;
+    letter-spacing: -0.025em;
+    /* Removed text-transform: capitalize to stop the "ick" */
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 0.5rem;
+    /* Removed text-transform: capitalize */
+  }
+
+  /* --- PARAGRAPHS --- */
+  p {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    line-height: 1.75;
+    color: #374151;
+  }
+
+  /* --- IMAGES & GRID LOGIC --- */
+  /* This targets paragraphs that contain images to allow for side-by-side grids */
+  p:has(img) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+  }
+
+  img {
+    display: block;
+    flex: 1 1 300px;
+    /* Allows images to grow and shrink into a grid */
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    height: auto;
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease;
+  }
+
+  img.ProseMirror-selectednode {
+    outline: 3px solid #16a34a;
+    box-shadow: 0 0 15px rgba(22, 163, 74, 0.3);
+  }
+
+  /* --- LINKS --- */
+  a {
+    color: #16a34a;
+    text-decoration: underline;
+    font-weight: 500;
+    word-break: break-word;
+    cursor: pointer;
+  }
+
+  /* --- LISTS --- */
+  ul {
+    list-style-type: disc !important;
+    padding-left: 1.5rem !important;
+    margin: 1rem 0;
+  }
+
+  ol {
+    list-style-type: decimal !important;
+    padding-left: 1.5rem !important;
+    margin: 1rem 0;
+  }
+
+  /* --- TABLES --- */
+  table {
+    border-collapse: collapse;
+    table-layout: auto;
+    width: 100%;
+    margin: 2rem 0;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+
+  td,
+  th {
+    min-width: 1em;
+    border: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  th {
+    font-weight: bold;
+    text-align: left;
+    background-color: #f8fafc;
+  }
+
+  /* --- BLOCKQUOTE --- */
+  blockquote {
+    border-left: 4px solid #16a34a;
+    background-color: #f0fdf4;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+    color: #166534;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  blockquote::before,
+  blockquote::after {
+    content: none;
+  }
+
+  /* --- HORIZONTAL RULE --- */
+  hr {
+    border: none;
+    border-top: 2px solid #e2e8f0;
+    margin: 2rem 0;
+    cursor: pointer;
+  }
+
+  hr.ProseMirror-selectednode {
+    border-top: 2px solid #16a34a;
+    outline: none;
+  }
+
+  /* --- TASK LISTS --- */
+  ul[data-type="taskList"] {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+
+  ul[data-type="taskList"] li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  ul[data-type="taskList"] li>label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+
+  ul[data-type="taskList"] input[type="checkbox"] {
+    cursor: pointer;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    accent-color: #16a34a;
+  }
+
+  ul[data-type="taskList"] input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+
+  ul[data-type="taskList"] li[data-checked="true"]>div {
+    color: #9ca3af;
+    text-decoration: line-through;
+  }
+}
+
+/* --- EXTERNAL PROSE OVERRIDES --- */
+.prose a {
+  color: #16a34a !important;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.prose hr {
+  height: 2px;
+  background-color: #e5e7eb;
+  border: none;
+  margin: 2rem 0;
+}
+
+/* --- TOOLTIPS --- */
+[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tooltip]:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background-color: #1f2937;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+[data-tooltip]:hover:before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --- CUSTOM SCROLLBAR --- */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f9fafb;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+  
+}
