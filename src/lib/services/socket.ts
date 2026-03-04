@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { API_URL } from '../api/apiClient';
 
 const SOCKET_OPTIONS = {
   reconnection: true,
@@ -9,4 +10,4 @@ const SOCKET_OPTIONS = {
 };
 
 // Get the socket server URL from environment or default
-export const socket = io("http://localhost:4000/admin", SOCKET_OPTIONS) as Socket;
+export const socket = io(API_URL + "/admin", SOCKET_OPTIONS) as Socket;
