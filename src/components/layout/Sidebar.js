@@ -20,10 +20,12 @@ import {
   BrickWallShield,
   UserStar,
   Newspaper,
+  ClipboardClock,
   TrendingUp,
   Plus,
   PlusCircle
 } from 'lucide-react';
+import Image from 'next/image';
 
 // Icon mapping
 const iconMap = {
@@ -40,6 +42,7 @@ const iconMap = {
   BrickWallShield,
   UserStar,
   Newspaper,
+  ClipboardClock
   TrendingUp,
   PlusCircle
 };
@@ -121,6 +124,25 @@ const navigationConfig = [
     icon: 'MessageSquare'
   },
   {
+    id: 'customer-support',
+    label: 'Customer Support',
+    icon: 'Users',
+    group: [
+      {
+        id: 'assign-customer-agent',
+        label: 'Assign Agent',
+        href: '/admin/customer-support/assign-agent',
+        icon: 'UserPlus'
+      },
+      {
+        id: 'customer-support-chat',
+        label: 'Customer Chat',
+        href: '/admin/customer-support/',
+        icon: 'MessageSquare'
+      },
+    ]
+  },
+  {
     id: 'profile',
     label: 'Profile',
     href: '/admin/profile',
@@ -157,6 +179,12 @@ const navigationConfig = [
     label: 'Settings',
     href: '/admin/settings',
     icon: 'Settings'
+  },
+  {
+    id: 'logs',
+    label: 'Logs',
+    href: '/admin/logs',
+    icon: 'ClipboardClock'
   }
 ];
 
@@ -195,11 +223,10 @@ export default function Sidebar({ isOpen, onClose }) {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
       {/* Header */}
-      <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100 flex-shrink-0">
-        <div className="flex items-center">
-          <Shield className="h-6 w-6 text-green-600 mr-2" />
-          <h2 className="text-lg font-bold text-gray-900">FamTech</h2>
-        </div>
+      <div className="h-18 flex items-center justify-between px-6 border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-center justify-center w-auto overflow-hidden h-full">
+                      <Image src="/images/logo-1.png" alt="FamTech Logo" width={160} height={32} />
+                    </div>
       </div>
       
       {/* Navigation */}

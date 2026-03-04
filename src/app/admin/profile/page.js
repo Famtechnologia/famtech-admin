@@ -36,19 +36,6 @@ export default function ProfilePage() {
     confirm: false,
   });
 
-  // const fetchMyProfile = useCallback(async () => {
-  //   try {
-  //     await checkUser();
-  //   } catch (error) {
-  //     console.error("Error fetching myProfile:", error);
-  //     setError("Failed to load myProfile");
-  //   }
-  // }, [checkUser]);
-
-  // useEffect(() => {
-  //   fetchMyProfile();
-  // }, [fetchMyProfile]);
-
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(""), 3000);

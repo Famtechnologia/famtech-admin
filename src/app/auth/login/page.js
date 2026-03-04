@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Shield, AlertCircle, Loader } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { login } from "@/lib/api/auth";
+import Image from "next/image";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -112,12 +113,12 @@ export default function AdminLogin() {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center">
-            <div className="flex items-center justify-center w-16 h-16 bg-green-600 rounded-full mb-4">
-              <Shield size={32} className="text-white" />
+            <div className="flex items-center justify-center w-auto overflow-hidden h-24">
+              <Image src="/images/logo-1.png" alt="FamTech Logo" width={200} height={32} />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            FamTech Admin
+            Admin Portal
           </h1>
           <p className="text-gray-600">Secure Administrator Access Portal</p>
         </div>
