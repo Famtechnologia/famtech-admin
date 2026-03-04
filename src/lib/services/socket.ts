@@ -10,4 +10,4 @@ const SOCKET_OPTIONS = {
 };
 
 // Get the socket server URL from environment or default
-export const socket = io(API_URL + "/admin", SOCKET_OPTIONS) as Socket;
+export const socket = io(`${API_URL}/admin`, SOCKET_OPTIONS) as Socket;
