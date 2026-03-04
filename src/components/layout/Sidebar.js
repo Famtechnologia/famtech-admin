@@ -42,9 +42,7 @@ const iconMap = {
   BrickWallShield,
   UserStar,
   Newspaper,
-  ClipboardClock,
-  TrendingUp,
-  PlusCircle
+  ClipboardClock
 };
 
 // Navigation configuration in JSON format - easy to extend
