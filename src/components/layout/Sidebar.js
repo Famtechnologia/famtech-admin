@@ -33,6 +33,9 @@ const iconMap = {
   Users,
   UserPlus,
   UsersRound,
+  ChevronDown,
+  ChevronRight,
+  Shield,
   ChartCandlestick,
   UserCheck,
   UserX,
@@ -42,7 +45,10 @@ const iconMap = {
   BrickWallShield,
   UserStar,
   Newspaper,
-  ClipboardClock
+  ClipboardClock,
+  TrendingUp,
+  Plus,
+  PlusCircle
 };
 
 // Navigation configuration in JSON format - easy to extend
