@@ -126,6 +126,12 @@ const navigationConfig = [
     href: '/admin/profile',
     icon: 'UserCog'
   },
+   {
+    id: 'blog-content',
+    label: 'Blog Content',
+    href: '/admin/blog-content',
+    icon: 'Newspaper'
+  },
   {
      id: 'blog',
     label: 'Blog',
