@@ -267,3 +267,14 @@ body {
   background: #10b981;
   
 }
+
+.blog-table-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.blog-table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.blog-table-scroll::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 999px;
+}

@@ -1,4 +1,4 @@
-// --- Image Structure 
+// --- Image Structure
 export interface RecordImage {
   url: string;
   fileId: string;
@@ -17,20 +17,31 @@ export interface Blog {
   _id: string;
   title: string;
   content: string;
-  niche: 'Agro' | 'Agrotech' | 'Poultry' | 'Livestock' | 'Crop Science' | 'Sustainability' | 'Farm Machinery' | 'Fishery' | 'Agribusiness' | 'Food Security';
+  niche:
+    | "Agro"
+    | "Agrotech"
+    | "Poultry"
+    | "Livestock"
+    | "Crop Science"
+    | "Sustainability"
+    | "Farm Machinery"
+    | "Fishery"
+    | "Agribusiness"
+    | "Food Security";
+  status: "pending" | "in-review" | "approved";
+  comment?: string | null;
   author: Author | string;
   minuteRead: number;
   views: number;
   isTrending: boolean;
-  blogImages: RecordImage[]; 
+  blogImages: RecordImage[];
   imageUrl?: string;
   createdAt: string;
   updatedAt: string;
   __v: number;
 }
 
-
-export interface PopulatedBlog extends Omit<Blog, 'author'> {
+export interface PopulatedBlog extends Omit<Blog, "author"> {
   author: Author;
 }
 
@@ -42,26 +53,36 @@ export interface BlogFormData {
   isTrending?: boolean;
 }
 
+// --- Dashboard Stats ---
+export interface BlogStats {
+  totalPosts: number;
+  totalViews: number;
+  avgReadTime: number;
+  leadsGenerated: number;
+  conversionRate: number;
+  changes: {
+    posts: number;
+    views: number;
+    avgReadTime: number;
+    leads: number;
+    conversionRate: number;
+  };
+}
 
-/**
- * Standard response for messages (delete, etc)
- */
+/** Standard response for messages (delete, etc) */
 export interface ApiResponse {
   message: string;
 }
 
-/**
- * Response returned when adding/updating blog images
- */
+/** Response returned when adding/updating blog images */
 export interface BlogImageResponse extends ApiResponse {
   blog: Blog;
 }
 
-/**
- * Response structure for paginated lists
- */
+/** Response structure for paginated lists */
 export interface BlogListResponse {
   blogs: Blog[];
   totalPages: number;
   currentPage: number;
+  totalResults: number;
 }
