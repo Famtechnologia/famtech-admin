@@ -71,8 +71,8 @@ export default function BlogTable({
   };
 
   const limit = 12;
-  const from = (currentPage - 1) * limit + 1;
-  const to = Math.min(currentPage * limit, totalResults);
+  const from = totalResults > 0 ? (currentPage - 1) * limit + 1 : 0;
+  const to = Math.min(currentPage * limit, totalResults || 0);
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
@@ -112,11 +112,10 @@ export default function BlogTable({
                   <button
                     key={niche}
                     onClick={() => handleTopicSelect(niche)}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                      selectedTopic === niche
-                        ? "text-green-600 font-medium"
-                        : "text-gray-700"
-                    }`}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${selectedTopic === niche
+                      ? "text-green-600 font-medium"
+                      : "text-gray-700"
+                      }`}
                   >
                     {niche}
                   </button>
@@ -146,7 +145,7 @@ export default function BlogTable({
           </thead>
 
           <tbody className="divide-y divide-gray-50">
-            {blogs.length === 0 ? (
+            {(!blogs || blogs.length === 0) ? (
               <tr>
                 <td
                   colSpan={5}
@@ -158,7 +157,7 @@ export default function BlogTable({
             ) : (
               blogs.map((blog) => {
                 const engRate =
-                  blog.views > 0
+                  (blog.views > 0 && totalResults > 0)
                     ? ((blog.views / totalResults) * 100).toFixed(1) + "%"
                     : "--";
 
@@ -177,8 +176,8 @@ export default function BlogTable({
                         {blog.status === "approved"
                           ? `Pub: ${formatDate(blog.createdAt)}`
                           : blog.status === "in-review"
-                          ? `Draft: ${formatDate(blog.createdAt)}`
-                          : "Awaiting Approval"}
+                            ? `Draft: ${formatDate(blog.createdAt)}`
+                            : "Awaiting Approval"}
                       </p>
                     </td>
 
@@ -223,7 +222,7 @@ export default function BlogTable({
           </span>{" "}
           of{" "}
           <span className="font-medium text-gray-700">
-            {totalResults.toLocaleString()}
+           {(totalResults || 0).toLocaleString()}
           </span>{" "}
           results
         </p>
