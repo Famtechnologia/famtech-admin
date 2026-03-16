@@ -58,7 +58,7 @@ export default function BlogPerformancePage() {
       const data = await getAllBlogs(params);
       setBlogs(data.blogs);
       setTotalPages(data.totalPages);
-      setTotalResults(data.totalResults ?? data.blogs.length);
+      setTotalResults(data.totalResults ?? data?.blogs?.length ?? 0);
     } catch (err) {
       console.error("Failed to fetch blogs:", err);
     } finally {
