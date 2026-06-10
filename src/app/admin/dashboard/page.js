@@ -117,20 +117,40 @@ export default function AdminDashboard() {
     <main className="w-full mx-auto p-6 min-h-screen bg-gray-50">
       {/* Header Section */}
       <div className="mb-8">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">System Overview</h1>
-            <p className="text-gray-600">Real-time performance monitoring and enterprise control.</p>
-          </div>
-          <div className="flex gap-3 max-sm:hidden">
-            <button className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
-              <Download size={20} />
-              <span>Export Report</span>
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium" onClick={() => router.push("/admin/staffs/create")}>
-              <Plus size={20} />
-              <span>Create New Admin</span>
-            </button>
+        {/* Banner Section */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-green-800 via-emerald-900 to-green-950 rounded-2xl p-6 md:p-8 shadow-md border border-emerald-800/20 mb-6">
+          {/* Decorative background design */}
+          <div className="absolute right-0 top-0 -mt-4 -mr-4 w-48 h-48 rounded-full bg-white/5 blur-3xl pointer-events-none" />
+          <div className="absolute left-1/3 bottom-0 -mb-8 w-64 h-64 rounded-full bg-green-500/10 blur-2xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-500/20 text-green-300 border border-green-500/30">
+                  Admin Console
+                </span>
+              </div>
+              <h1 className="text-3xl font-bold text-white tracking-tight">
+                System Overview
+              </h1>
+              <p className="text-green-100/80 mt-1 max-w-xl text-sm">
+                Real-time performance monitoring and enterprise control.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 self-start sm:self-center">
+              <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-green-100 bg-white/10 hover:bg-white/25 border border-white/10 rounded-xl transition duration-150 shadow-sm cursor-pointer">
+                <Download size={18} />
+                <span>Export Report</span>
+              </button>
+              <button 
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold bg-white text-green-950 hover:bg-green-50 rounded-xl transition duration-150 shadow-md cursor-pointer"
+                onClick={() => router.push("/admin/staffs/create")}
+              >
+                <Plus size={18} />
+                <span>Create New Admin</span>
+              </button>
+            </div>
           </div>
         </div>
 
